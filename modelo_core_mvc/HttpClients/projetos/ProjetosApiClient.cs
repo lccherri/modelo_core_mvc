@@ -31,7 +31,7 @@ namespace modelo_core_mvc.HttpClients
         {
             if (_configuration["identity:type"] == "azuread")
             {
-                string[] initialScopes = _configuration.GetValue<string>("CallApi:ScopeForAccessToken")?.Split(' ').Take(1).ToArray();
+                string[] initialScopes = _configuration.GetValue<string>("CallApi:ScopeForAccessToken")?.Split(' ').ToArray();
 
                 try
                 {

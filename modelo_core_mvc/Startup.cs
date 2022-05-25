@@ -53,7 +53,7 @@ namespace modelo_core_mvc
             else
             if (Configuration["identity:type"] == "azuread")
             {
-                string[] initialScopes = Configuration.GetValue<string>("CallApi:ScopeForAccessToken")?.Split(' ').Take(1).ToArray();
+                string[] initialScopes = Configuration.GetValue<string>("CallApi:ScopeForAccessToken")?.Split(' ').ToArray();
 
                 services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
                     .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
