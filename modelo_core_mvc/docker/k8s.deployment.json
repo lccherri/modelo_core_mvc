@@ -35,11 +35,11 @@
             ],
             "resources": {
               "requests": {
-                "cpu": "200m",
-                "memory": "100Mi"
+                "cpu": "300m",
+                "memory": "250Mi"
                   },
               "limits": {
-                "memory": "600Mi",
+                "memory": "700Mi",
                 "cpu": "1000m"
                 }
               }
