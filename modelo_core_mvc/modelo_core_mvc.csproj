@@ -4,13 +4,23 @@
     <TargetFramework>net6.0</TargetFramework>
     <UserSecretsId>0d4a2248-4b8b-433e-8f34-e96e7f345773</UserSecretsId>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <CodeAnalysisRuleSet>..\.sonarlint\layout_padrao_modelo_core_mvc_aygxajevl6m6qipcv4zvcsharp.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\.sonarlint\layout_padrao_modelo_core_mvc_aygxajevl6m6qipcv4zv\CSharp\SonarLint.xml" Link="SonarLint.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.20.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.WsFederation" Version="6.0.5" />
+    <PackageReference Include="Microsoft.Graph" Version="4.32.0" />
     <PackageReference Include="Microsoft.Identity.Web.UI" Version="1.24.1" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="4.9.0" />
     <PackageReference Include="System.ServiceModel.Http" Version="4.9.0" />

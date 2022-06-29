@@ -1,0 +1,12 @@
+{
+  "ServerUri": "http://srv11648:9000/sonar/",
+  "Organization": null,
+  "ProjectKey": "Layout_Padrao_modelo_core_mvc_AYGXajEvl6m6QiPcv4zV",
+  "ProjectName": "modelo_core_mvc",
+  "Profiles": {
+    "CSharp": {
+      "ProfileKey": "AYGW_hJzKm8dk2fNtwFs",
+      "ProfileTimestamp": "2022-06-24T18:34:02Z"
+    }
+  }
+}

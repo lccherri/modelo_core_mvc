@@ -14,7 +14,6 @@ namespace modelo_core_mvc.Controllers
         private IConfiguration Configuration;
         private readonly ProjetosApiClient _api;
 
-
         //Insercao de teste de vulnerabilidade
         private readonly string[] whiteList = { "https://ads.intra.fazenda.sp.gov.br/tfs" };
 
@@ -41,6 +40,12 @@ namespace modelo_core_mvc.Controllers
             return View();
         }
 
+        public IActionResult Contato()
+        {
+            ViewData["Title"] = "Contato";
+            return View();
+        }
+
         public IActionResult TesteIdentity()
         {
             var claims = User.Claims;
@@ -59,21 +64,13 @@ namespace modelo_core_mvc.Controllers
             return View();
         }
 
-        public IActionResult Contato()
-        {
-            ViewData["Title"] = "Contato";
-            ViewData["Message"] = "Fale conosco";
-
-            return View();
-        }
-
         [Authorize]
         public async Task<IActionResult> SairAsync()
         {
             ViewData["Title"] = "Sair";
             ViewData["Message"] = "Encerrar a sessão";
             await IdentityConfig.Logout(HttpContext);
-            
+
             return View();
         }
 
