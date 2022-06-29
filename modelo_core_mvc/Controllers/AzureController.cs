@@ -3,6 +3,7 @@ using Azure.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -45,10 +46,8 @@ namespace modelo_core_mvc.Controllers
                     .Request()
                     .GetAsync();
 
-                //var siteContent = await site
-                //                        .Request()
-                //                        .GetAsync();
-
+                var queryOptions = new List<QueryOption>() { new QueryOption("expand", "fields(select=Item,Title,Attachemnts,teste)") }; 
+                var items = await graphClient.Sites[siteId].Lists[listaId].Items.Request(queryOptions).GetAsync();
 
                 ViewData["mensagem"] = lista.ToString();
             }
