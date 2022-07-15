@@ -8,7 +8,6 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using modelo_core_mvc.HttpClients;
 using modelo_core_mvc.Identity;
-using modelo_core_mvc.Models;
 using System.Linq;
 
 namespace modelo_core_mvc
@@ -67,9 +66,7 @@ namespace modelo_core_mvc
             }
 
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
-
             services.AddHttpClient<ProjetosApiClient>();
-
             services.AddApplicationInsightsTelemetry(Configuration["ApplicationInsights:ConnectionString"]);
         }
 

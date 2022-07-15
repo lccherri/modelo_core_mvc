@@ -1,0 +1,18 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+<h1>@ViewData["Message"]</h1>
+<div aria-label="breadcrumb" role="link">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a asp-area="" asp-controller="Azure" asp-action="DadosUser">Dados do usuário</a></li>
+    </ol>
+</div>
+
+<section>
+    <h2>Informações do usuário</h2>
+    <p>Login: @ViewData["login"]</p>
+    <p>Nome: @ViewData["nome"]</p>
+    <p>Foto: @ViewData["foto"]</p>
+    <p>______________________________________________</p>
+    <p>Token: @ViewData["token"]</p>
+</section>

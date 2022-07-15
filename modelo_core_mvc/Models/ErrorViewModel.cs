@@ -1,6 +1,6 @@
 using System;
 
-namespace modelo_core_mvc.Models
+namespace modelo_core_mvc.Usuario
 {
     public class ErrorViewModel
     {

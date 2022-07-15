@@ -18,11 +18,11 @@ namespace modelo_core_mvc.HttpClients
         private string accessToken;
 
         //AzureAD
-        //public ProjetosApiClient(HttpClient httpClient, IConfiguration configuration, ITokenAcquisition tokenAcquisition)
-        public ProjetosApiClient(HttpClient httpClient, IConfiguration configuration)
+        public ProjetosApiClient(HttpClient httpClient, IConfiguration configuration, ITokenAcquisition tokenAcquisition)
+        //public ProjetosApiClient(HttpClient httpClient, IConfiguration configuration)
         {
             _configuration = configuration;
-            //_tokenAcquisition = tokenAcquisition; //AzureAD
+            _tokenAcquisition = tokenAcquisition; //AzureAD
             _httpClient = httpClient;
             _httpClient.BaseAddress = new System.Uri(_configuration["apiendereco:projetos"]);
 

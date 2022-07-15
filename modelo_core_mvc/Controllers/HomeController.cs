@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using modelo_core_mvc.Models;
+using modelo_core_mvc.Usuario;
 using modelo_core_mvc.HttpClients;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
