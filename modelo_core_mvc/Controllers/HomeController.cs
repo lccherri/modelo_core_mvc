@@ -11,10 +11,12 @@ namespace modelo_core_mvc.Controllers
 {
     public class HomeController : Controller
     {
-        private IConfiguration Configuration;
+        private readonly IConfiguration Configuration;
         private readonly ProjetosApiClient _api;
 
-        //Insercao de teste de vulnerabilidade
+        //Insercao de vulnerabilidades para teste de análise de código
+        string username = "teste";
+        string password = "123@teste";
         private readonly string[] whiteList = { "https://ads.intra.fazenda.sp.gov.br/tfs" };
 
         public IActionResult RedirectMe(string url)
