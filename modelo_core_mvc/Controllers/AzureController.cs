@@ -1,98 +1,61 @@
-﻿using Azure.Core;
-using Azure.Identity;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
+using SefazLib.MSGraphUtils;
+using modelo_core_mvc.Models;
 using System.Net.Http;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace modelo_core_mvc.Controllers
 {
     //[AuthorizeForScopes(Scopes = new[] { "user.read" })]
     public class AzureController : Controller
     {
-        private readonly IConfiguration Configuration;
+        private readonly MSGraphUtil mSGraphUtil;
+        private MSListTesteModel mSListTesteModel { get; set; }
 
-        public AzureController(IConfiguration configuration)
+        public AzureController(IConfiguration Configuration, MSGraphUtil MSGraphUtil, MSListTesteModel MSListTesteModel)
         {
-            Configuration = configuration;
+            mSGraphUtil = MSGraphUtil;
+            mSListTesteModel = MSListTesteModel;
         }
+
 
         [Authorize]
-        public async Task<ViewResult> DadosUser()
+        //Chamada do MS Graph com permission do tipo Delegated
+        //Nesse tipo, é utilizada a autenticação do usuário para concessão de permissão
+        public async Task<ViewResult> MSGraphDelegatedAsync()
         {
-            var tenantId     = Configuration["AzureAd:TenantId"];
-            var clientId     = Configuration["AzureAd:ClientId"];
-            var clientSecret = Configuration["AzureAd:ClientSecret"];
-            var redirect_uri = Configuration["Identity:realm"];
-            var graphRoot    = Configuration.GetValue<string>("CallApi:MicrosoftGraph")?.Split(' ').FirstOrDefault();
-            var scopes = new[] { "User.Read" };
-            var options = new TokenCredentialOptions
-            {
-                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
-            };
+            //"https://graph.microsoft.com/v1.0/sites/fazendaspgovbr.sharepoint.com/:/sites/PreparaConformes"
 
-            var url = $"https://login.microsoftonline.com/{tenantId}"+
-                      $"/oauth2/v2.0/authorize?client_id={clientId}" +
-                      $"&response_type=code" +
-                      $"&redirect_uri={redirect_uri}" +
-                      $"&response_mode=query&scope={graphRoot}{scopes[0]}";
+            GraphServiceClient graphClientDelegated = await mSGraphUtil.ObterGraphClientDelegatedAsync();
 
-            try
-            {
-                var authorizationCode = "";
+            ViewData["login"] = mSGraphUtil.jwtToken["upn"];
+            ViewData["nome"] = mSGraphUtil.jwtToken["name"];
+            ViewData["scp"] = mSGraphUtil.jwtToken["scp"];
+            ViewData["token"] = mSGraphUtil.graphToken;
 
-                var httpClient = new HttpClient();
-                //httpClient.BaseAddress = new System.Uri(Configuration["apiendereco:projetos"]);
-                //httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                var resposta = httpClient.GetAsync(url).Result;
-                var conteudo = resposta.Content.ReadAsStringAsync();
-                
-                var authCodeCredential = new AuthorizationCodeCredential(
-                    tenantId, clientId, clientSecret, authorizationCode, options);
-
-                var graphClient = new GraphServiceClient(authCodeCredential, scopes);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                throw;
-            }
-
-            //var graphClient = ObterGraphClientAsync("Delegated");
-            //ViewData["token"] = graphToken;
-
-            try
-            {
-                //var user = graphClient.Request().GetAsync();
-                //ViewData["login"] = user;
-                //ViewData["nome"] = user.DisplayName;
-
-                //using (var photoStream = await _graphServiceClient.Me.Photo.Content.Request().GetAsync())
-                //{
-                //    byte[] photoByte = ((MemoryStream)photoStream).ToArray();
-                //    ViewData["foto"] = Convert.ToBase64String(photoByte);
-                //}
-            }
-            catch (Exception ex)
-            {
-                ViewData["foto"] = null;
-            }
             return View();
         }
-        
-        public async Task<IActionResult> MicrosoftGraphAsync()
+
+        //Chamada do MS Graph com permission do tipo Application
+        //Nesse tipo, é utilizada a autenticação da aplicação, com uso de Secret ou Certificate, para concessão de permissão
+        public async Task<IActionResult> MSListAsync()
         {
-            var graphClient = await ObterGraphClientAsync("Application");
-            //ViewData["token"] = graphToken;
+            GraphServiceClient graphClient = await mSGraphUtil.ObterGraphClientApplicationAsync();
+            ViewData["app_name"] = mSGraphUtil.jwtToken["app_displayname"];
+            ViewData["roles"]    = mSGraphUtil.jwtToken["roles"];
+            ViewData["token"]    = mSGraphUtil.graphToken;
+
+            var lista = new List<MSListTesteModel>();
 
             var siteId = "fazendaspgovbr.sharepoint.com,6d117106-a0df-4b73-8834-99756806b907,37489eab-f4d0-4ad0-8031-886758dade5f";
+            ViewData["siteId"] = siteId;
+
             var listaId = "2306a558-a803-4e25-955e-3136deed7c00";
 
             var sites = graphClient.Sites;
@@ -100,7 +63,7 @@ namespace modelo_core_mvc.Controllers
 
             try
             {
-                var colunas = await graphClient.Sites[siteId].Lists[listaId].Columns
+                var colunas = await site.Lists[listaId].Columns
                     .Request()
                     .GetAsync();
 
@@ -110,47 +73,87 @@ namespace modelo_core_mvc.Controllers
                     nomesColunas[colunas.IndexOf(column)] = column.Name;
                 }
 
-                var drives = await graphClient.Sites[siteId].Drives
+                var drives = await site.Drives
                     .Request()
                     .GetAsync();
 
                 var queryOptions = new List<QueryOption>() { new QueryOption("expand", "fields(select=Item,Title,Attachemnts,teste)") };
-                var items = await graphClient.Sites[siteId].Lists[listaId].Items.Request(queryOptions).GetAsync();
+                var items = await site.Lists[listaId].Items.Request(queryOptions).GetAsync();
+                foreach (var item in items)
+                {
+                    var valores = new List<string>();
+                    foreach (var dado in item.Fields.AdditionalData)
+                    {
+                        valores.Add(dado.Value.ToString());
+                    }
+                    lista.Add(new MSListTesteModel(valores[1], valores[2]));
+                }
 
-                ViewData["mensagem"] = drives.ToString();
+                ViewData["mensagem"] = string.Format("Itens da lista {0}", site.Lists[listaId]);
             }
             catch (System.Exception e)
             {
                 ViewData["mensagem"] = e.Message;
             }
 
+            return View(lista);
+        }
+
+        [HttpGet]
+        public ActionResult Adicionar()
+        {
+            ViewData["Title"] = "Novo Projeto";
+            ViewData["Message"] = "Incluir novo projeto";
+            return View(new MSListTesteModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Adicionar(MSListTesteModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                return RedirectToAction("Index");
+            }
+            return BadRequest();
+        }
+
+        [HttpGet]
+        public ActionResult Alterar()
+        {
+            ViewData["Title"] = "Editar Projeto";
+            ViewData["Message"] = "Editar informações do projeto";
             return View();
         }
-        
-        private async Task<GraphServiceClient> ObterGraphClientAsync(string tipo)
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Alterar(MSListTesteModel model)
         {
-            var tenantId = Configuration["AzureAd:TenantId"];
-            var clientId = Configuration["AzureAd:ClientId"];
-            var clientSecret = Configuration["AzureAd:ClientSecret"];
-
-            //siteId -> https://fazendaspgovbr-my.sharepoint.com/personal/login_fazenda_sp_gov_br/_api/site/id
-
-            var options = new TokenCredentialOptions
+            if (ModelState.IsValid)
             {
-                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
-            };
-
-            string[] scopes = Configuration.GetValue<string>("CallApi:MicrosoftGraphDefault")?.Split(' ').ToArray();
-            var clientSecretCredential = new ClientSecretCredential(tenantId,
-                                                                    clientId,
-                                                                    clientSecret,
-                                                                    options);
-
-            var tokenRequestContext = new TokenRequestContext(scopes);
-            //graphToken = clientSecretCredential!.GetTokenAsync(tokenRequestContext).Result.Token;
-
-            return new GraphServiceClient(clientSecretCredential, scopes);
+                return RedirectToAction("Index");
+            }
+            return BadRequest();
         }
 
+        [HttpGet]
+        public ActionResult Excluir()
+        {
+            ViewData["Title"] = "Excluir Projeto";
+            ViewData["Message"] = "Exclusão do projeto";
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Excluir(MSListTesteModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                return RedirectToAction("Index");
+            }
+            return BadRequest();
+        }
     }
 }

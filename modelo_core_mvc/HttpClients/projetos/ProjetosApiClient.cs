@@ -7,69 +7,49 @@ using modelo_core_mvc.projetos;
 using System.Diagnostics;
 using Microsoft.Identity.Web;
 using System.Linq;
+using SefazLib.MSGraphUtils;
 
-namespace modelo_core_mvc.HttpClients
+namespace modelo_core_mvc.ProjetosApi
 {
     public class ProjetosApiClient
     {
-        private readonly HttpClient _httpClient;
-        private readonly IConfiguration _configuration;
-        private readonly ITokenAcquisition _tokenAcquisition; //AzureAD
+        private readonly HttpClient httpClient;
+        private readonly IConfiguration configuration;
+        private readonly MSGraphUtil mSGraphUtil;
         private string accessToken;
 
         //AzureAD
-        public ProjetosApiClient(HttpClient httpClient, IConfiguration configuration, ITokenAcquisition tokenAcquisition)
-        //public ProjetosApiClient(HttpClient httpClient, IConfiguration configuration)
+        public ProjetosApiClient(HttpClient HttpClient, IConfiguration Configuration, MSGraphUtil MSGraphUtil)
+        //public ProjetosApiClient(HttpClient HttpClient, IConfiguration Configuration)
         {
-            _configuration = configuration;
-            _tokenAcquisition = tokenAcquisition; //AzureAD
-            _httpClient = httpClient;
-            _httpClient.BaseAddress = new System.Uri(_configuration["apiendereco:projetos"]);
+            configuration = Configuration;
+            mSGraphUtil = MSGraphUtil;
+            httpClient = HttpClient;
+            httpClient.BaseAddress = new System.Uri(configuration["apiendereco:projetos"]);
 
-        }
-
-        private async Task PrepareAuthenticatedClient()
-        {
-            if (_configuration["identity:type"] == "azuread")
-            {
-                string[] initialScopes = _configuration.GetValue<string>("CallApi:ScopeForAccessToken")?.Split(' ').ToArray();
-
-                try
-                {
-                    accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(initialScopes);
-                }
-                catch (System.Exception e)
-                {
-                    Debug.WriteLine(e.Message);
-                    throw;
-                }
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            };
-
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         //Consultar
-        public async Task<Projetos> GetProjetoAsync(long cd_projeto)
+        public async Task<ProjetosModel> GetProjetoAsync(long cd_projeto)
         {
-            await PrepareAuthenticatedClient();
-            var resposta = await _httpClient.GetAsync($"Projetos/{cd_projeto}");
+            await mSGraphUtil.PrepareAuthenticatedClient();
+            var resposta = await httpClient.GetAsync($"Projetos/{cd_projeto}");
             resposta.EnsureSuccessStatusCode();
-            return new Projetos().ToModel(await resposta.Content.ReadAsStringAsync());
+            return new ProjetosModel().ToModel(await resposta.Content.ReadAsStringAsync());
         }
 
         //Listar todos
-        public async Task<IEnumerable<Projetos>> GetProjetosAsync()
+        public async Task<IEnumerable<ProjetosModel>> GetProjetosAsync()
         {
-            var resposta = await _httpClient.GetAsync($"Projetos");
+            var resposta = await httpClient.GetAsync($"Projetos");
             resposta.EnsureSuccessStatusCode();
-            return new Projetos().ToList(await resposta.Content.ReadAsStringAsync());
+            return new ProjetosModel().ToList(await resposta.Content.ReadAsStringAsync());
         }
 
         //Verificar api
         public async Task<string> GetStatusAsync()
         {
-            var resposta = await _httpClient.GetAsync($"projetos/status");
+            var resposta = await httpClient.GetAsync($"projetos/status");
             resposta.EnsureSuccessStatusCode();
             return await resposta.Content.ReadAsStringAsync();
         }
@@ -77,7 +57,7 @@ namespace modelo_core_mvc.HttpClients
         //Verificar conexão
         public async Task<string> GetConexaoAsync()
         {
-            var resposta = await _httpClient.GetAsync($"projetos/conexao");
+            var resposta = await httpClient.GetAsync($"projetos/conexao");
             resposta.EnsureSuccessStatusCode();
             return await resposta.Content.ReadAsStringAsync();
         }
@@ -86,31 +66,31 @@ namespace modelo_core_mvc.HttpClients
         {
             if (cd_projeto != 0)
             {
-                await PrepareAuthenticatedClient();
-                var resposta = await _httpClient.DeleteAsync($"Projetos/{cd_projeto}");
+                await mSGraphUtil.PrepareAuthenticatedClient();
+                var resposta = await httpClient.DeleteAsync($"Projetos/{cd_projeto}");
                 resposta.EnsureSuccessStatusCode();
             }
         }
 
         //Incluir
-        public async Task PostProjetoAsync(Projetos projeto)
+        public async Task PostProjetoAsync(ProjetosModel projeto)
         {
-            await PrepareAuthenticatedClient();
-            var resposta = await _httpClient.PostAsync("Projetos", projeto.ToJson());
+            await mSGraphUtil.PrepareAuthenticatedClient();
+            var resposta = await httpClient.PostAsync("Projetos", projeto.ToJson());
             resposta.EnsureSuccessStatusCode();
         }
 
         //Alterar
-        public async Task PutProjetoAsync(Projetos projeto)
+        public async Task PutProjetoAsync(ProjetosModel projeto)
         {
-            await PrepareAuthenticatedClient();
-            var resposta = await _httpClient.PutAsync("Projetos", projeto.ToJson());
+            await mSGraphUtil.PrepareAuthenticatedClient();
+            var resposta = await httpClient.PutAsync("Projetos", projeto.ToJson());
             resposta.EnsureSuccessStatusCode();
         }
 
         public async Task<byte[]> GetAnexoAsync(long cd_projeto)
         {
-            var resposta = await _httpClient.GetAsync($"Projetos/{cd_projeto}/anexo");
+            var resposta = await httpClient.GetAsync($"Projetos/{cd_projeto}/anexo");
             resposta.EnsureSuccessStatusCode();
             return await resposta.Content.ReadAsByteArrayAsync();
         }

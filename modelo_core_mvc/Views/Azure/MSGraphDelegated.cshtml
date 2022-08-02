@@ -1,0 +1,31 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+<h1>@ViewData["Message"]</h1>
+<div aria-label="breadcrumb" role="link">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a asp-area="" asp-controller="Azure" asp-action="MSGraphDelegated">MSGraph - User</a></li>
+    </ol>
+</div>
+
+<section>
+    <h2>Informações do Graph</h2>
+    <ul>
+        <li>TenantId: @Configuration["AzureAd:TenantId"]</li>
+        <li>ClientId: @Configuration["AzureAd:ClientId"]</li>
+        <li>CallApi: @Configuration["CallApi:MicrosoftGraph"]</li>
+    </ul>
+    <p>______________________________________________</p>
+
+    <h2>Informações do token</h2>
+    <p>Login: @ViewData["login"]</p>
+    <p>Nome:  @ViewData["nome"]</p>
+    <p>scope:</p>
+    <p>@ViewData["scp"]</p>
+    <p>Token: @ViewData["token"]</p>
+    <p>______________________________________________</p>
+
+    <h2>Resposta da api</h2>
+    <p>@ViewData["mensagem"]</p>
+</section>

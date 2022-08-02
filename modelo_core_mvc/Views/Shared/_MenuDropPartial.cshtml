@@ -1,20 +1,28 @@
 ﻿@using Microsoft.AspNetCore.Authentication
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
 
 <div class="dropdown menu_popup_drop">
-    <i id="botao_popup" class="dropdown-toggle fas fa-user-cog" data-toggle="dropdown" aria-expanded="false" alt="Menu de informações do sistema"></i>
+
+    <i id="botao_popup" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" alt="Menu de informações do sistema">
+        <mgt-person person-query="me"></mgt-person>
+    </i>
     <ul class="dropdown-menu drp-mnu">
         <li>
             <em class="fas fa-mail-bulk"></em>
             <a asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
         </li>
-        <li>
-            <em class="fas fa-project-diagram"></em>
-            <a asp-area="" asp-controller="Azure" asp-action="MicrosoftGraph">Microsoft Graph</a>
-        </li>
-        <li>
-            <em class="fas fa-project-diagram"></em>
-            <a asp-area="" asp-controller="Azure" asp-action="DadosUser">Dados do usuário</a>
-        </li>
+        @if (Configuration["identity:type"] == "azuread")
+        {
+            <li>
+                <em class="fas fa-project-diagram"></em>
+                <a asp-area="" asp-controller="Azure" asp-action="MSList">MSList</a>
+            </li>
+            <li>
+                <em class="fas fa-project-diagram"></em>
+                <a asp-area="" asp-controller="Azure" asp-action="MSGraphDelegated">MSGraph - Del</a>
+            </li>
+        }
         <li>
             <em class="fas fa-id-card"></em>
             <a asp-area="" asp-controller="Home" asp-action="TesteIdentity">Teste do Identity</a>

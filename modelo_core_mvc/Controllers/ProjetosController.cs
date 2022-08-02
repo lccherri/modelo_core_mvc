@@ -1,19 +1,19 @@
 ﻿using modelo_core_mvc.projetos;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using modelo_core_mvc.HttpClients;
 using Microsoft.AspNetCore.Authorization;
+using modelo_core_mvc.ProjetosApi;
 
 namespace modelo_core_mvc.Controllers
 {
     [Authorize]
     public class ProjetosController : Controller
     {
-        private readonly ProjetosApiClient _api;
+        private readonly ProjetosApiClient api;
 
-        public ProjetosController(ProjetosApiClient api)
+        public ProjetosController(ProjetosApiClient Api)
         {
-            _api = api;
+            api = Api;
         }
 
         [AllowAnonymous]
@@ -23,7 +23,7 @@ namespace modelo_core_mvc.Controllers
             ViewData["Title"] = "Projetos";
             ViewData["Message"] = "Projetos do DTI";
 
-            return View(await _api.GetProjetosAsync());
+            return View(await api.GetProjetosAsync());
         }
 
         [AllowAnonymous]
@@ -32,7 +32,7 @@ namespace modelo_core_mvc.Controllers
         {
             ViewData["Title"] = "Projeto";
             ViewData["Message"] = "";
-            return View(await _api.GetProjetoAsync(cd_projeto));
+            return View(await api.GetProjetoAsync(cd_projeto));
         }
 
         [HttpGet]
@@ -40,16 +40,16 @@ namespace modelo_core_mvc.Controllers
         {
             ViewData["Title"] = "Novo Projeto";
             ViewData["Message"] = "Incluir novo projeto";
-            return View(new Projetos());
+            return View(new ProjetosModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Adicionar(Projetos model)
+        public async Task<ActionResult> Adicionar(ProjetosModel model)
         {
             if (ModelState.IsValid)
             {
-                await _api.PostProjetoAsync(model);
+                await api.PostProjetoAsync(model);
                 return RedirectToAction("Index");
             }
             return BadRequest();
@@ -60,17 +60,17 @@ namespace modelo_core_mvc.Controllers
         {
             ViewData["Title"] = "Editar Projeto";
             ViewData["Message"] = "Editar informações do projeto";
-            var model = await _api.GetProjetoAsync(cd_projeto);
+            var model = await api.GetProjetoAsync(cd_projeto);
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Alterar(Projetos model)
+        public async Task<ActionResult> Alterar(ProjetosModel model)
         {
             if (ModelState.IsValid)
             {
-                await _api.PutProjetoAsync(model);
+                await api.PutProjetoAsync(model);
                 return RedirectToAction("Index");
             }
             return BadRequest();
@@ -81,17 +81,17 @@ namespace modelo_core_mvc.Controllers
         {
             ViewData["Title"] = "Excluir Projeto";
             ViewData["Message"] = "Exclusão do projeto";
-            var model = await _api.GetProjetoAsync(cd_projeto);
+            var model = await api.GetProjetoAsync(cd_projeto);
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Excluir(Projetos model)
+        public async Task<ActionResult> Excluir(ProjetosModel model)
         {
             if (ModelState.IsValid)
             {
-                await _api.DeleteProjetoAsync(model.cd_projeto);
+                await api.DeleteProjetoAsync(model.cd_projeto);
                 return RedirectToAction("Index");
             }
             return BadRequest();

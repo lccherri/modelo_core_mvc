@@ -1,18 +1,21 @@
-﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using modelo_core_mvc.Usuario;
-using modelo_core_mvc.HttpClients;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using modelo_core_mvc.Identity;
+using Microsoft.Extensions.Configuration;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using SefazLib.IdentityCfg;
+using SefazLib.MSGraphUtils;
+using modelo_core_mvc.usuarios;
+using modelo_core_mvc.ProjetosApi;
+using modelo_core_mvc.Errors;
 
 namespace modelo_core_mvc.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IConfiguration Configuration;
-        private readonly ProjetosApiClient _api;
+        private readonly IConfiguration configuration;
+        private readonly ProjetosApiClient api;
+        private readonly MSGraphUtil mSGraphUtil;
 
         //Insercao de vulnerabilidades para teste de análise de código
         string username = "teste";
@@ -25,10 +28,41 @@ namespace modelo_core_mvc.Controllers
         }
         //Fim do teste
 
-        public HomeController(IConfiguration configuration, ProjetosApiClient api)
+        public HomeController(IConfiguration Configuration, ProjetosApiClient Api, MSGraphUtil MSGraphUtil)
         {
-            Configuration = configuration;
-            _api = api;
+            configuration = Configuration;
+            api = Api;
+            mSGraphUtil = MSGraphUtil;
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Entrar()
+        {
+            if (configuration["identity:type"] == "azuread")
+            {
+                Usuario usuario = await mSGraphUtil.GetUserAsync();
+                ViewData["html"] = usuario.AdaptiveCard().Html;
+                ViewData["id"] = usuario.id;
+            }
+            else
+            {
+                var claims = User.Claims;
+                foreach (var claim in User.Claims)
+                {
+                    if (claim.Type.Contains("upn"))              { ViewData["Login"]      = claim.Value; }
+                    else if (claim.Type.Contains("name"))        { ViewData["Nome"]       = claim.Value; }
+                    else if (claim.Type.Contains("CPF"))         { ViewData["Cpf"]        = claim.Value; }
+                    else if (claim.Type.Contains("dateofbirth")) { ViewData["Nascimento"] = claim.Value; }
+                }
+            }
+            ViewData["Title"] = "Entrar";
+
+            return View();
+        }
+        public IActionResult TesteIdentity()
+        {
+            ViewData["Title"] = "Teste do Identity";
+            return View();
         }
 
         public IActionResult Index()
@@ -48,20 +82,13 @@ namespace modelo_core_mvc.Controllers
             return View();
         }
 
-        public IActionResult TesteIdentity()
-        {
-            var claims = User.Claims;
-            ViewData["Title"] = "Teste do Identity";
-            return View();
-        }
-
         public async Task<ActionResult> Sobre()
         {
             ViewData["Title"] = "Sobre";
             ViewData["Message"] = "Sobre essa aplicação";
-            ViewData["status"] = await _api.GetStatusAsync();
-            ViewData["conexao"] = await _api.GetConexaoAsync();
-            ViewData["EnderecoAPI"] = Configuration["apiendereco:projetos"];
+            ViewData["status"] = await api.GetStatusAsync();
+            ViewData["conexao"] = await api.GetConexaoAsync();
+            ViewData["EnderecoAPI"] = configuration["apiendereco:projetos"];
 
             return View();
         }
@@ -71,15 +98,7 @@ namespace modelo_core_mvc.Controllers
         {
             ViewData["Title"] = "Sair";
             ViewData["Message"] = "Encerrar a sessão";
-            await IdentityConfig.Logout(HttpContext);
-
-            return View();
-        }
-
-        [Authorize]
-        public IActionResult Entrar()
-        {
-            ViewData["Title"] = "Entrar";
+            await IdentityConfig.Logout(HttpContext, configuration);
 
             return View();
         }

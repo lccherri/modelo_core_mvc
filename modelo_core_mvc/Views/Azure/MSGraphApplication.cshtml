@@ -4,7 +4,7 @@
 <div aria-label="breadcrumb" role="link">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a asp-area="" asp-controller="Home" asp-action="Graph">Graph</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a asp-area="" asp-controller="Azure" asp-action="MSGraphApplication">MSGraph - App</a></li>
     </ol>
 </div>
 
@@ -16,7 +16,17 @@
         <li>CallApi: @Configuration["CallApi:MicrosoftGraph"]</li>
     </ul>
     <p>______________________________________________</p>
+
+    <h2>Informações do token</h2>
+    <p>App Registration: @ViewData["app_name"] </p>
+    <p>Roles:</p>
+    <p>@ViewData["roles"] </p>
+
     <p>Token: @ViewData["token"]</p>
-    <p>Response: @ViewData["mensagem"]</p>
+
+    <p>______________________________________________</p>
+
+    <h2>Resposta da api</h2>
+    <p>@ViewData["mensagem"]</p>
 
 </section>

@@ -6,9 +6,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
-using modelo_core_mvc.HttpClients;
-using modelo_core_mvc.Identity;
+using SefazLib.IdentityCfg;
+using SefazLib.MSGraphUtils;
+using modelo_core_mvc.ProjetosApi;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using modelo_core_mvc.Models;
 
 namespace modelo_core_mvc
 {
@@ -24,50 +27,45 @@ namespace modelo_core_mvc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            if (Configuration["identity:type"] == "azuread")
-            {
-                services.AddControllersWithViews().AddMicrosoftIdentityUI();
-            }
-            else
-            {
-                services.AddControllersWithViews();
-            }
+            string[] initialScopes = Configuration.GetValue<string>("CallApi:ScopeForAccessToken")?.Split(' ').ToArray();
 
             IdentityConfig identityConfig = new IdentityConfig(Configuration);
             var opcoesAutenticacao = identityConfig.AuthenticationOptions;
 
-            if (Configuration["identity:type"] == "openid")
+            switch (Configuration["identity:type"])
             {
-                services.AddAuthentication(opcoesAutenticacao)
-                        .AddOpenIdConnect(identityConfig.OpenIdConnectOptions)
-                        .AddCookie();
+                case "azuread":
+                    services.AddControllersWithViews().AddMicrosoftIdentityUI();
+                    services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
+                            .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
+                            .AddInMemoryTokenCaches();
+                    break;
+                case ("wsfed"):
+                    services.AddControllersWithViews();
+                    services.AddAuthentication(opcoesAutenticacao)
+                            .AddWsFederation(identityConfig.WSFederationOptions)
+                            .AddCookie();
+                    break;
+                case ("openid"):
+                    services.AddControllersWithViews();
+                    services.AddAuthentication(opcoesAutenticacao)
+                            .AddOpenIdConnect(identityConfig.OpenIdConnectOptions)
+                            .AddCookie();
+                    break;
+                default:
+                    services.AddControllersWithViews();
+                    services.AddAuthentication(opcoesAutenticacao)
+                            .AddWsFederation(identityConfig.WSFederationOptions)
+                            .AddCookie("Cookies", identityConfig.CookieAuthenticationOptions);
+                    break;
             }
-            else
-            if (Configuration["identity:type"] == "wsfed")
-            {
-                services.AddAuthentication(opcoesAutenticacao)
-                        .AddWsFederation(identityConfig.WSFederationOptions)
-                        .AddCookie();
-            }
-            else
-            if (Configuration["identity:type"] == "azuread")
-            {
-                string[] initialScopes = Configuration.GetValue<string>("CallApi:ScopeForAccessToken")?.Split(' ').ToArray();
 
-                services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
-                    .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
-                    .AddInMemoryTokenCaches();
-            }
-            else
-            {
-                services.AddAuthentication(opcoesAutenticacao)
-                        .AddWsFederation(identityConfig.WSFederationOptions)
-                        .AddCookie("Cookies", identityConfig.CookieAuthenticationOptions);
-            }
-
-            services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddHttpClient<ProjetosApiClient>();
             services.AddApplicationInsightsTelemetry(Configuration["ApplicationInsights:ConnectionString"]);
+            services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.AddHttpClient<ProjetosApiClient>();
+            services.AddTransient<MSGraphUtil>();
+            services.AddTransient<MSListTesteModel>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -94,9 +92,7 @@ namespace modelo_core_mvc
                 });
             }
 
-            //app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
 
             app.UseAuthentication();

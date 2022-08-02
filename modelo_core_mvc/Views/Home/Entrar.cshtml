@@ -1,4 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Authentication
+@using modelo_core_mvc.Errors;
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
 @{
     var nomeExibicao = "Não autenticado";
     if (User.Identity.IsAuthenticated)
@@ -20,4 +23,33 @@
     <h1>Usuário autenticado:</h1>
     <p></p>
     <h2>@nomeExibicao </h2>
+
+    @if (Configuration["identity:type"] == "azuread")
+    {
+        <h1>Adaptive card:</h1>
+
+        <div class="login">
+            <mgt-msal2-provider client-id="@Configuration["AzureAd:ClientId"]"></mgt-msal2-provider>
+            <mgt-login></mgt-login>
+        </div>
+
+        <p>User Id: @ViewData["id"]</p>
+        <div class="mgt-person">
+            Card com Id:
+            <p>
+                <mgt-person user-id="@ViewData["id"]" view="twoLines"></mgt-person>
+            </p>
+            Card com hover:
+            <p>
+                <mgt-person class="my-person" view="twoLines" line2-property="title" person-card="hover" fetch-image> </mgt-person>
+            </p>
+        </div>
+    }
+    else
+    {
+        <p>Login: @ViewData["Login"]</p>
+        <p>Cpf: @ViewData["Cpf"]</p>
+        <p>Nascimento: @ViewData["Nascimento"]</p>
+    }
+
 </section>

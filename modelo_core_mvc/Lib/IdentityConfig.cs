@@ -9,8 +9,9 @@ using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using modelo_core_mvc;
 
-namespace modelo_core_mvc.Identity
+namespace SefazLib.IdentityCfg
 {
     public class IdentityConfig
     {
@@ -19,36 +20,29 @@ namespace modelo_core_mvc.Identity
         public Action<CookieAuthenticationOptions> CookieAuthenticationOptions { get; private set; }
         public Action<Microsoft.AspNetCore.Authentication.AuthenticationOptions> AuthenticationOptions { get; private set; }
         public Action<OpenIdConnectOptions> OpenIdConnectOptions { get; private set; }
-        public static Boolean logoff { get; private set; }
+        public static Boolean Logoff { get; private set; }
         public IdentityConfig(IConfiguration Configuration)
         {
+            Logoff = false;
             configuration = Configuration;
-            logoff = false;
 
             AuthenticationOptions = options =>
             {
-                if (Configuration["identity:type"] == "jwt")
+                switch (Configuration["identity:type"])
                 {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    case "jwt":
+                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                        break;
+                    case ("openid" or "azuread"):
+                        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                        options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                        break;
+                    default:
+                        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                        options.DefaultChallengeScheme = WsFederationDefaults.AuthenticationScheme;
+                        break;
                 }
-                else
-                if (Configuration["identity:type"] == "openid")
-                {
-                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-                }
-                else
-                if (Configuration["identity:type"] == "azuread")
-                {
-                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-                }
-                else
-                {
-                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = WsFederationDefaults.AuthenticationScheme;
-                };
             };
 
             WSFederationOptions = options =>
@@ -115,28 +109,24 @@ namespace modelo_core_mvc.Identity
             };
         }
 
-        public static async Task Logout(HttpContext httpContext)
+        public static async Task Logout(HttpContext httpContext, IConfiguration Configuration)
         {
             await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            if (configuration["identity:type"] == "jwt")
+
+            switch (Configuration["identity:type"])
             {
-                await httpContext.SignOutAsync(JwtBearerDefaults.AuthenticationScheme);
+                case "jwt":
+                    await httpContext.SignOutAsync(JwtBearerDefaults.AuthenticationScheme);
+                    break;
+                case ("openid" or "azuread"):
+                    await httpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
+                    break;
+                default:
+                    await httpContext.SignOutAsync(WsFederationDefaults.AuthenticationScheme);
+                    break;
             }
-            else
-                if (configuration["identity:type"] == "openid")
-            {
-                await httpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
-            }
-            else
-                if (configuration["identity:type"] == "azuread")
-            {
-                await httpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
-            }
-            else
-            {
-                await httpContext.SignOutAsync(WsFederationDefaults.AuthenticationScheme);
-            };
-            logoff = true;
+
+            Logoff = true;
         }
 
         private static async Task<Task<int>> OnSecurityTokenReceived(SecurityTokenReceivedContext arg)

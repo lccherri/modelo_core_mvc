@@ -1,0 +1,61 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@using modelo_core_mvc.Models;
+@model IEnumerable<MSListTesteModel>
+
+@{
+    ViewData["Title"] = "Lista SharePoint";
+}
+
+<h1>Lista</h1>
+
+<p>
+    <a asp-action="Adicionar" class="btn btn-regular mr-1">+ Adicionar item</a>
+</p>
+<table class="table">
+    <caption>Página em desenvolvimento</caption>
+    <h2>Informações do Graph</h2>
+    <ul>
+        <li>TenantId: @Configuration["AzureAd:TenantId"]</li>
+        <li>ClientId: @Configuration["AzureAd:ClientId"]</li>
+        <li>CallApi:  @Configuration["CallApi:MicrosoftGraph"]</li>
+    </ul>
+    <p>______________________________________________</p>
+
+    <h2>Informações do token</h2>
+    <p>App name: @ViewData["app_name"]</p>
+    <p>siteId:  @ViewData["siteId"]</p>
+    <p>Roles:</p>
+    <p>@ViewData["roles"]</p>
+    <p>Token: @ViewData["token"]</p>
+    <p>______________________________________________</p>
+
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.coluna1)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.coluna2)
+            </th>
+            <th>Operação</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.coluna1)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.coluna2)
+                </td>
+                <td>
+                    <a asp-action="Alterar" class="btn btn-sucesso mr-1">Alterar</a> |
+                    <a asp-action="Excluir" class="btn btn-outline-danger mr-1">Excluir</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
