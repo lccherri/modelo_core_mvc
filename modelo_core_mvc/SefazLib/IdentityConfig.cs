@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using modelo_core_mvc;
+using SefazIdentity;
 
 namespace SefazLib.IdentityCfg
 {

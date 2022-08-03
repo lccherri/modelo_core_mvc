@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Text;
 
-namespace modelo_core_mvc.usuarios
+namespace SefazLib.usuarios
 {
     public class Usuario
     {

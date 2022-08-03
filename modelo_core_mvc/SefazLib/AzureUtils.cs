@@ -1,25 +1,22 @@
 ﻿using Azure.Core;
-using Microsoft.AspNetCore.Mvc;
 using Azure.Identity;
+using Microsoft.Identity.Web;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
-using Microsoft.Identity.Client;
+using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Identity.Web;
-using System.IO;
-using System;
-using modelo_core_mvc.usuarios;
 using System.IdentityModel.Tokens.Jwt;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Diagnostics;
 using System.Net.Http.Headers;
-using System.Security.Claims;
+using SefazLib.usuarios;
 
-namespace SefazLib.MSGraphUtils
+namespace SefazLib.AzureUtils
 {
-    public class MSGraphUtil
+    public class AzureUtil
     {
         private readonly HttpClient httpClient;
         private readonly IConfiguration configuration;
@@ -31,7 +28,7 @@ namespace SefazLib.MSGraphUtils
         private readonly ITokenAcquisition tokenAcquisition;
 
         //Autenticação com AzureAD
-        public MSGraphUtil(HttpClient HttpClient, IConfiguration Configuration, ITokenAcquisition TokenAcquisition)
+        public AzureUtil(HttpClient HttpClient, IConfiguration Configuration, ITokenAcquisition TokenAcquisition)
         {
             httpClient = HttpClient;
             configuration = Configuration;
@@ -42,7 +39,7 @@ namespace SefazLib.MSGraphUtils
         }
 
         //Autenticação sem AzureAD
-        public MSGraphUtil(HttpClient HttpClient, IConfiguration Configuration)
+        public AzureUtil(HttpClient HttpClient, IConfiguration Configuration)
         {
             httpClient = HttpClient;
             configuration = Configuration;
@@ -51,6 +48,7 @@ namespace SefazLib.MSGraphUtils
             tenantId = Configuration["AzureAd:TenantId"];
         }
 
+        //Preparação do http ara autenticacao de api
         public async Task PrepareAuthenticatedClient()
         {
             if (configuration["identity:type"] == "azuread")
@@ -139,12 +137,6 @@ namespace SefazLib.MSGraphUtils
         {
             var scopes = new[] { "User.Read" };
             await obterGraphToken(scopes, null);
-
-            var cca = ConfidentialClientApplicationBuilder
-                .Create(clientId)
-                .WithTenantId(tenantId)
-                .WithClientSecret(clientSecret)
-                .Build();
 
             var authProvider = new DelegateAuthenticationProvider(async (request) =>
             {

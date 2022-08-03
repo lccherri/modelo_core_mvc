@@ -4,22 +4,22 @@ using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Text;
 
-namespace modelo_core_mvc.Models
+namespace SefazIdentity.Models
 {
-    public class MSListTesteModel
+    public class ListModel
     {
         [Display(Name = "Cargo")]
         public string coluna1 { get; set; }
         [Display(Name = "teste")]
         public string coluna2 { get; set; }
 
-        public MSListTesteModel(string Coluna1, string Coluna2)
+        public ListModel(string Coluna1, string Coluna2)
         {
             coluna1 = Coluna1;
             coluna2 = Coluna2;
         }
 
-        public MSListTesteModel()
+        public ListModel()
         {
         }
 
@@ -28,14 +28,14 @@ namespace modelo_core_mvc.Models
             return new StringContent(JsonConvert.SerializeObject(this), Encoding.UTF8, "application/json");
         }
 
-        public MSListTesteModel ToModel(string MSListJson)
+        public ListModel ToModel(string MSListJson)
         {
-            return JsonConvert.DeserializeObject<MSListTesteModel>(MSListJson);
+            return JsonConvert.DeserializeObject<ListModel>(MSListJson);
         }
 
-        public IEnumerable<MSListTesteModel> ToList(string MSListJson)
+        public IEnumerable<ListModel> ToList(string MSListJson)
         {
-            return JsonConvert.DeserializeObject<IEnumerable<MSListTesteModel>>(MSListJson);
+            return JsonConvert.DeserializeObject<IEnumerable<ListModel>>(MSListJson);
         }
     }
 }

@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
-using modelo_core_mvc.projetos;
+using SefazIdentity.projetos;
 using System.Diagnostics;
 using Microsoft.Identity.Web;
 using System.Linq;
-using SefazLib.MSGraphUtils;
+using SefazLib.AzureUtils;
 
-namespace modelo_core_mvc.ProjetosApi
+namespace SefazIdentity.ProjetosApi
 {
     public class ProjetosApiClient
     {
         private readonly HttpClient httpClient;
         private readonly IConfiguration configuration;
-        private readonly MSGraphUtil mSGraphUtil;
+        private readonly AzureUtil mSGraphUtil;
         private string accessToken;
 
         //AzureAD
-        public ProjetosApiClient(HttpClient HttpClient, IConfiguration Configuration, MSGraphUtil MSGraphUtil)
+        public ProjetosApiClient(HttpClient HttpClient, IConfiguration Configuration, AzureUtil MSGraphUtil)
         //public ProjetosApiClient(HttpClient HttpClient, IConfiguration Configuration)
         {
             configuration = Configuration;

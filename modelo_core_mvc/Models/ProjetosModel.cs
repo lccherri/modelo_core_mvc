@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Text;
 
-namespace modelo_core_mvc.projetos
+namespace SefazIdentity.projetos
 {
     public class ProjetosModel
     {

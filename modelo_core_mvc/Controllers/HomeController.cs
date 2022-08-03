@@ -4,18 +4,18 @@ using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using SefazLib.IdentityCfg;
-using SefazLib.MSGraphUtils;
-using modelo_core_mvc.usuarios;
-using modelo_core_mvc.ProjetosApi;
-using modelo_core_mvc.Errors;
+using SefazLib.AzureUtils;
+using SefazLib.usuarios;
+using SefazIdentity.ProjetosApi;
+using SefazIdentity.Errors;
 
-namespace modelo_core_mvc.Controllers
+namespace SefazIdentity.Controllers
 {
     public class HomeController : Controller
     {
         private readonly IConfiguration configuration;
         private readonly ProjetosApiClient api;
-        private readonly MSGraphUtil mSGraphUtil;
+        private readonly AzureUtil mSGraphUtil;
 
         //Insercao de vulnerabilidades para teste de análise de código
         string username = "teste";
@@ -28,7 +28,7 @@ namespace modelo_core_mvc.Controllers
         }
         //Fim do teste
 
-        public HomeController(IConfiguration Configuration, ProjetosApiClient Api, MSGraphUtil MSGraphUtil)
+        public HomeController(IConfiguration Configuration, ProjetosApiClient Api, AzureUtil MSGraphUtil)
         {
             configuration = Configuration;
             api = Api;

@@ -4,24 +4,21 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SefazLib.MSGraphUtils;
-using modelo_core_mvc.Models;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Text;
+using SefazLib.AzureUtils;
+using SefazIdentity.Models;
 
-namespace modelo_core_mvc.Controllers
+namespace SefazIdentity.Controllers
 {
     //[AuthorizeForScopes(Scopes = new[] { "user.read" })]
     public class AzureController : Controller
     {
-        private readonly MSGraphUtil mSGraphUtil;
-        private MSListTesteModel mSListTesteModel { get; set; }
+        private readonly AzureUtil azureUtil;
+        private ListModel listModel { get; set; }
 
-        public AzureController(IConfiguration Configuration, MSGraphUtil MSGraphUtil, MSListTesteModel MSListTesteModel)
+        public AzureController(IConfiguration Configuration, AzureUtil AzureUtil, ListModel ListModel)
         {
-            mSGraphUtil = MSGraphUtil;
-            mSListTesteModel = MSListTesteModel;
+            azureUtil = AzureUtil;
+            listModel = ListModel;
         }
 
 
@@ -32,26 +29,26 @@ namespace modelo_core_mvc.Controllers
         {
             //"https://graph.microsoft.com/v1.0/sites/fazendaspgovbr.sharepoint.com/:/sites/PreparaConformes"
 
-            GraphServiceClient graphClientDelegated = await mSGraphUtil.ObterGraphClientDelegatedAsync();
+            GraphServiceClient graphClientDelegated = await azureUtil.ObterGraphClientDelegatedAsync();
 
-            ViewData["login"] = mSGraphUtil.jwtToken["upn"];
-            ViewData["nome"] = mSGraphUtil.jwtToken["name"];
-            ViewData["scp"] = mSGraphUtil.jwtToken["scp"];
-            ViewData["token"] = mSGraphUtil.graphToken;
+            ViewData["login"] = azureUtil.jwtToken["upn"];
+            ViewData["nome"] = azureUtil.jwtToken["name"];
+            ViewData["scp"] = azureUtil.jwtToken["scp"];
+            ViewData["token"] = azureUtil.graphToken;
 
             return View();
         }
 
         //Chamada do MS Graph com permission do tipo Application
         //Nesse tipo, é utilizada a autenticação da aplicação, com uso de Secret ou Certificate, para concessão de permissão
-        public async Task<IActionResult> MSListAsync()
+        public async Task<IActionResult> List()
         {
-            GraphServiceClient graphClient = await mSGraphUtil.ObterGraphClientApplicationAsync();
-            ViewData["app_name"] = mSGraphUtil.jwtToken["app_displayname"];
-            ViewData["roles"]    = mSGraphUtil.jwtToken["roles"];
-            ViewData["token"]    = mSGraphUtil.graphToken;
+            GraphServiceClient graphClient = await azureUtil.ObterGraphClientApplicationAsync();
+            ViewData["app_name"] = azureUtil.jwtToken["app_displayname"];
+            ViewData["roles"]    = azureUtil.jwtToken["roles"];
+            ViewData["token"]    = azureUtil.graphToken;
 
-            var lista = new List<MSListTesteModel>();
+            var lista = new List<ListModel>();
 
             var siteId = "fazendaspgovbr.sharepoint.com,6d117106-a0df-4b73-8834-99756806b907,37489eab-f4d0-4ad0-8031-886758dade5f";
             ViewData["siteId"] = siteId;
@@ -86,7 +83,7 @@ namespace modelo_core_mvc.Controllers
                     {
                         valores.Add(dado.Value.ToString());
                     }
-                    lista.Add(new MSListTesteModel(valores[1], valores[2]));
+                    lista.Add(new ListModel(valores[1], valores[2]));
                 }
 
                 ViewData["mensagem"] = string.Format("Itens da lista {0}", site.Lists[listaId]);
@@ -104,12 +101,12 @@ namespace modelo_core_mvc.Controllers
         {
             ViewData["Title"] = "Novo Projeto";
             ViewData["Message"] = "Incluir novo projeto";
-            return View(new MSListTesteModel());
+            return View(new ListModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Adicionar(MSListTesteModel model)
+        public ActionResult Adicionar(ListModel model)
         {
             if (ModelState.IsValid)
             {
@@ -128,7 +125,7 @@ namespace modelo_core_mvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Alterar(MSListTesteModel model)
+        public ActionResult Alterar(ListModel model)
         {
             if (ModelState.IsValid)
             {
@@ -147,7 +144,7 @@ namespace modelo_core_mvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Excluir(MSListTesteModel model)
+        public ActionResult Excluir(ListModel model)
         {
             if (ModelState.IsValid)
             {

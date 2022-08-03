@@ -1,10 +1,10 @@
-﻿using modelo_core_mvc.projetos;
+﻿using SefazIdentity.projetos;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using modelo_core_mvc.ProjetosApi;
+using SefazIdentity.ProjetosApi;
 
-namespace modelo_core_mvc.Controllers
+namespace SefazIdentity.Controllers
 {
     [Authorize]
     public class ProjetosController : Controller

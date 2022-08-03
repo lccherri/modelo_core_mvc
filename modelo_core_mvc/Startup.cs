@@ -7,13 +7,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using SefazLib.IdentityCfg;
-using SefazLib.MSGraphUtils;
-using modelo_core_mvc.ProjetosApi;
+using SefazLib.AzureUtils;
+using SefazIdentity.ProjetosApi;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using modelo_core_mvc.Models;
+using SefazIdentity.Models;
 
-namespace modelo_core_mvc
+namespace SefazIdentity
 {
     public class Startup
     {
@@ -64,8 +64,8 @@ namespace modelo_core_mvc
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddHttpClient<ProjetosApiClient>();
-            services.AddTransient<MSGraphUtil>();
-            services.AddTransient<MSListTesteModel>();
+            services.AddTransient<AzureUtil>();
+            services.AddTransient<ListModel>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

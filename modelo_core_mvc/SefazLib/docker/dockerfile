@@ -1,5 +1,9 @@
+#Utilize a task Replace Tokens para substituir os valores 
+# . versaodotnet: Versao do .Net (core): 
+# . nomeapp: nome da aplicacao
+
 FROM repoweb-microsrv.intra.fazenda.sp.gov.br:5000/dotnet/aspnet:__versaodotnet__-alpine
-WORKDIR /var/wwroot/modelo_core_mvc
+WORKDIR /var/wwroot/__nomeapp__
 
 #Adiciona usuario do Container (Non Root)
 RUN adduser -D app 
@@ -12,6 +16,6 @@ COPY . .
 COPY CA.crt /usr/local/share/ca-certificates/
 RUN update-ca-certificates &&  chown app -R .
 
-#Usuario que rodará o container
+#Usuario que rodara o container
 USER app
-ENTRYPOINT ["dotnet", "modelo_core_mvc.dll"]
+ENTRYPOINT ["dotnet", "__nomeapp__.dll"]

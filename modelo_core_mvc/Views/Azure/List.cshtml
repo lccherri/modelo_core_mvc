@@ -1,7 +1,7 @@
 ﻿@using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
-@using modelo_core_mvc.Models;
-@model IEnumerable<MSListTesteModel>
+@using SefazIdentity.Models;
+@model IEnumerable<ListModel>
 
 @{
     ViewData["Title"] = "Lista SharePoint";
@@ -13,23 +13,7 @@
     <a asp-action="Adicionar" class="btn btn-regular mr-1">+ Adicionar item</a>
 </p>
 <table class="table">
-    <caption>Página em desenvolvimento</caption>
-    <h2>Informações do Graph</h2>
-    <ul>
-        <li>TenantId: @Configuration["AzureAd:TenantId"]</li>
-        <li>ClientId: @Configuration["AzureAd:ClientId"]</li>
-        <li>CallApi:  @Configuration["CallApi:MicrosoftGraph"]</li>
-    </ul>
-    <p>______________________________________________</p>
-
-    <h2>Informações do token</h2>
-    <p>App name: @ViewData["app_name"]</p>
-    <p>siteId:  @ViewData["siteId"]</p>
-    <p>Roles:</p>
-    <p>@ViewData["roles"]</p>
-    <p>Token: @ViewData["token"]</p>
-    <p>______________________________________________</p>
-
+    
     <thead>
         <tr>
             <th>
@@ -59,3 +43,22 @@
         }
     </tbody>
 </table>
+
+<p>______________________________________________</p>
+
+<h2>Informações do Graph</h2>
+    <ul>
+        <li>TenantId: @Configuration["AzureAd:TenantId"]</li>
+        <li>ClientId: @Configuration["AzureAd:ClientId"]</li>
+        <li>CallApi:  @Configuration["CallApi:MicrosoftGraph"]</li>
+    </ul>
+    <p>______________________________________________</p>
+
+    <h2>Informações do token</h2>
+    <p>App name: @ViewData["app_name"]</p>
+    <p>siteId:  @ViewData["siteId"]</p>
+    <p>Roles:</p>
+    <p>@ViewData["roles"]</p>
+    <p>Token: @ViewData["token"]</p>
+    <p>______________________________________________</p>
+

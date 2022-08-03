@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace modelo_core_mvc
+namespace SefazIdentity
 {
     using System.Runtime.Serialization;
     
@@ -110,23 +110,23 @@ namespace modelo_core_mvc
         System.Threading.Tasks.Task<bool> IsTokenValidAsync(string tokenXml, string realm, string tipoLogin);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ITokenWS/ValidateToken", ReplyAction="http://tempuri.org/ITokenWS/ValidateTokenResponse")]
-        System.Threading.Tasks.Task<modelo_core_mvc.ClaimsPrincipal> ValidateTokenAsync(string tokenXml, string realm, string tipoLogin);
+        System.Threading.Tasks.Task<SefazIdentity.ClaimsPrincipal> ValidateTokenAsync(string tokenXml, string realm, string tipoLogin);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ITokenWS/ObterClaimsCore", ReplyAction="http://tempuri.org/ITokenWS/ObterClaimsCoreResponse")]
-        System.Threading.Tasks.Task<modelo_core_mvc.ClaimCore[]> ObterClaimsCoreAsync(string tokenXml, string realm, string tipoLogin);
+        System.Threading.Tasks.Task<SefazIdentity.ClaimCore[]> ObterClaimsCoreAsync(string tokenXml, string realm, string tipoLogin);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ITokenWS/ObterRealm", ReplyAction="http://tempuri.org/ITokenWS/ObterRealmResponse")]
         System.Threading.Tasks.Task<string> ObterRealmAsync(string tokenXml);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
-    public interface ITokenWSChannel : modelo_core_mvc.ITokenWS, System.ServiceModel.IClientChannel
+    public interface ITokenWSChannel : SefazIdentity.ITokenWS, System.ServiceModel.IClientChannel
     {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
-    public partial class TokenWSClient : System.ServiceModel.ClientBase<modelo_core_mvc.ITokenWS>, modelo_core_mvc.ITokenWS
+    public partial class TokenWSClient : System.ServiceModel.ClientBase<SefazIdentity.ITokenWS>, SefazIdentity.ITokenWS
     {
         
         /// <summary>
@@ -174,12 +174,12 @@ namespace modelo_core_mvc
             return base.Channel.IsTokenValidAsync(tokenXml, realm, tipoLogin);
         }
         
-        public System.Threading.Tasks.Task<modelo_core_mvc.ClaimsPrincipal> ValidateTokenAsync(string tokenXml, string realm, string tipoLogin)
+        public System.Threading.Tasks.Task<SefazIdentity.ClaimsPrincipal> ValidateTokenAsync(string tokenXml, string realm, string tipoLogin)
         {
             return base.Channel.ValidateTokenAsync(tokenXml, realm, tipoLogin);
         }
         
-        public System.Threading.Tasks.Task<modelo_core_mvc.ClaimCore[]> ObterClaimsCoreAsync(string tokenXml, string realm, string tipoLogin)
+        public System.Threading.Tasks.Task<SefazIdentity.ClaimCore[]> ObterClaimsCoreAsync(string tokenXml, string realm, string tipoLogin)
         {
             return base.Channel.ObterClaimsCoreAsync(tokenXml, realm, tipoLogin);
         }
