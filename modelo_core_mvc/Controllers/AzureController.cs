@@ -5,9 +5,9 @@ using Microsoft.Graph;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SefazLib.AzureUtils;
-using SefazIdentity.Models;
+using modelo_core_mvc.Models;
 
-namespace SefazIdentity.Controllers
+namespace modelo_core_mvc.Controllers
 {
     //[AuthorizeForScopes(Scopes = new[] { "user.read" })]
     public class AzureController : Controller

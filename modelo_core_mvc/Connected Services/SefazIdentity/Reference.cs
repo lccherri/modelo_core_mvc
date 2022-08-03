@@ -9,9 +9,6 @@
 
 namespace SefazIdentity
 {
-    using System.Runtime.Serialization;
-    
-    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.0.2")]
     [System.Runtime.Serialization.DataContractAttribute(Name="ClaimsPrincipal", Namespace="http://schemas.datacontract.org/2004/07/System.Security.Claims")]

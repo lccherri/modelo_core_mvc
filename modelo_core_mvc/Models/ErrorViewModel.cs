@@ -1,6 +1,6 @@
 using System;
 
-namespace SefazIdentity.Errors
+namespace modelo_core_mvc.Errors
 {
     public class ErrorViewModel
     {

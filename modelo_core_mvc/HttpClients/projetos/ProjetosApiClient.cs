@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
-using SefazIdentity.projetos;
+using modelo_core_mvc.projetos;
 using System.Diagnostics;
 using Microsoft.Identity.Web;
 using System.Linq;
 using SefazLib.AzureUtils;
 
-namespace SefazIdentity.ProjetosApi
+namespace modelo_core_mvc.ProjetosApi
 {
     public class ProjetosApiClient
     {

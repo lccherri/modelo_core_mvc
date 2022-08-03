@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace SefazIdentity
+namespace modelo_core_mvc
 {
     public class Program
     {

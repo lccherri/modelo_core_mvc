@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Text;
 
-namespace SefazIdentity.Models
+namespace modelo_core_mvc.Models
 {
     public class ListModel
     {

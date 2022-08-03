@@ -8,12 +8,12 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using SefazLib.IdentityCfg;
 using SefazLib.AzureUtils;
-using SefazIdentity.ProjetosApi;
+using modelo_core_mvc.ProjetosApi;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using SefazIdentity.Models;
+using modelo_core_mvc.Models;
 
-namespace SefazIdentity
+namespace modelo_core_mvc
 {
     public class Startup
     {

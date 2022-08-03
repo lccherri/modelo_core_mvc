@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using SefazLib.IdentityCfg;
 using SefazLib.AzureUtils;
 using SefazLib.usuarios;
-using SefazIdentity.ProjetosApi;
-using SefazIdentity.Errors;
+using modelo_core_mvc.ProjetosApi;
+using modelo_core_mvc.Errors;
 
-namespace SefazIdentity.Controllers
+namespace modelo_core_mvc.Controllers
 {
     public class HomeController : Controller
     {
