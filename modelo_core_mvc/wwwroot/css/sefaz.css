@@ -1481,6 +1481,7 @@ pre {
 .erro {
     padding: 7px 0px 7px 10px;
     background-color: #ed1d24;
+    color: yellow;
 }
 
     .erro h5 {

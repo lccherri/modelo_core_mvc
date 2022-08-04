@@ -91,6 +91,12 @@
                     @RenderBody()
                 </main>
             </div>
+            <div>
+                @if (ViewData["Erro"] != null)
+                {
+                    @ViewData["Erro"]
+                }
+            </div>
             <hr>
         </div>
     </div>

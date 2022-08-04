@@ -18,19 +18,19 @@ namespace SefazLib.AzureUtils
 {
     public class AzureUtil
     {
-        private readonly HttpClient httpClient;
+        public HttpClient httpClient;
+        public string graphToken;
+        public Dictionary<string, string> jwtToken;
         private readonly IConfiguration configuration;
         private readonly string tenantId;
         private readonly string clientId;
         private readonly string clientSecret;
-        public string graphToken;
-        public Dictionary<string, string> jwtToken;
         private readonly ITokenAcquisition tokenAcquisition;
 
         //Autenticação com AzureAD
-        public AzureUtil(HttpClient HttpClient, IConfiguration Configuration, ITokenAcquisition TokenAcquisition)
+        public AzureUtil(IConfiguration Configuration, ITokenAcquisition TokenAcquisition)
         {
-            httpClient = HttpClient;
+            httpClient = new HttpClient();
             configuration = Configuration;
             clientId = configuration["AzureAd:ClientId"];
             clientSecret = configuration["AzureAd:ClientSecret"];
@@ -39,9 +39,9 @@ namespace SefazLib.AzureUtils
         }
 
         //Autenticação sem AzureAD
-        public AzureUtil(HttpClient HttpClient, IConfiguration Configuration)
+        public AzureUtil(IConfiguration Configuration)
         {
-            httpClient = HttpClient;
+            httpClient = new HttpClient();
             configuration = Configuration;
             clientId = Configuration["AzureAd:ClientId"];
             clientSecret = Configuration["AzureAd:ClientSecret"];
@@ -49,7 +49,7 @@ namespace SefazLib.AzureUtils
         }
 
         //Preparação do http ara autenticacao de api
-        public async Task PrepareAuthenticatedClient()
+        public async Task<AuthenticationHeaderValue> AuthenticationHeader()
         {
             if (configuration["identity:type"] == "azuread")
             {
@@ -67,7 +67,7 @@ namespace SefazLib.AzureUtils
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             };
 
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            return httpClient.DefaultRequestHeaders.Authorization;
         }
 
         public async Task<Usuario> GetUserAsync()

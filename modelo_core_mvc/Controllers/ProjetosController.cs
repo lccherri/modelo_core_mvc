@@ -49,8 +49,18 @@ namespace modelo_core_mvc.Controllers
         {
             if (ModelState.IsValid)
             {
-                await api.PostProjetoAsync(model);
-                return RedirectToAction("Index");
+                try
+                {
+                    await api.PostProjetoAsync(model);
+                    return RedirectToAction("Index");
+                }
+                catch 
+                {
+                    ViewData["Title"] = "Novo Projeto";
+                    ViewData["Message"] = "Incluir novo projeto";
+                    ViewData["Erro"] = "Essa aplicação não está configurada para acessar a API.";
+                    return View(model);
+                }
             }
             return BadRequest();
         }
@@ -70,8 +80,16 @@ namespace modelo_core_mvc.Controllers
         {
             if (ModelState.IsValid)
             {
-                await api.PutProjetoAsync(model);
-                return RedirectToAction("Index");
+                try
+                {
+                    await api.PutProjetoAsync(model);
+                    return RedirectToAction("Index");
+                }
+                catch 
+                {
+                    ViewData["Erro"] = "Essa aplicação não está configurada para acessar a API.";
+                    return View(model);
+                }
             }
             return BadRequest();
         }
@@ -89,12 +107,23 @@ namespace modelo_core_mvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Excluir(ProjetosModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                await api.DeleteProjetoAsync(model.cd_projeto);
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    await api.DeleteProjetoAsync(model.cd_projeto);
+                    return RedirectToAction("Index");
+                }
+                return BadRequest();
             }
-            return BadRequest();
+            catch 
+            {
+                ViewData["Title"] = "Excluir Projeto";
+                ViewData["Message"] = "Exclusão do projeto"; 
+                model = await api.GetProjetoAsync(model.cd_projeto);
+                ViewData["Erro"] = "Essa aplicação não está configurada para acessar a API.";
+                return View(model);
+            }
         }
     }
 }
