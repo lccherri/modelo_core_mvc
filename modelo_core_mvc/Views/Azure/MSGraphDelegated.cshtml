@@ -1,6 +1,8 @@
 ﻿@using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
 
+<script src="https://unpkg.com/adaptivecards-designer/dist/adaptivecards-designer.js"></script>
+
 <h1>@ViewData["Message"]</h1>
 <div aria-label="breadcrumb" role="link">
     <ol class="breadcrumb">
@@ -26,6 +28,27 @@
     <p>Token: @ViewData["token"]</p>
     <p>______________________________________________</p>
 
-    <h2>Resposta da api</h2>
-    <p>@ViewData["mensagem"]</p>
+    <h1>Adaptive card:</h1>
+
+        <div class="login">
+            <mgt-msal2-provider client-id="@Configuration["AzureAd:ClientId"]"></mgt-msal2-provider>
+            <mgt-login></mgt-login>
+        </div>
+
+        <p>User Id: @ViewData["id"]</p>
+        <div class="mgt-person">
+            Card com Id:
+            <p>
+                <mgt-person user-id="@ViewData["id"]" view="twoLines"></mgt-person>
+            </p>
+            Card com hover:
+            <p>
+                <mgt-person class="my-person" view="twoLines" line2-property="title" person-card="hover" fetch-image> </mgt-person>
+            </p>
+        </div>
+
+        <div>
+            <p>Html</p>
+            @Html.Raw(@ViewData["html"])
+        </div>
 </section>

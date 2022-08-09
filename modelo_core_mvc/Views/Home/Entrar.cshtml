@@ -44,6 +44,11 @@
                 <mgt-person class="my-person" view="twoLines" line2-property="title" person-card="hover" fetch-image> </mgt-person>
             </p>
         </div>
+
+        <div>
+            <p>Html</p>
+            @Html.Raw(@ViewData["html"])
+        </div>
     }
     else
     {

@@ -41,7 +41,7 @@ namespace modelo_core_mvc.Controllers
             if (configuration["identity:type"] == "azuread")
             {
                 Usuario usuario = await mSGraphUtil.GetUserAsync();
-                ViewData["html"] = usuario.AdaptiveCard().Html;
+                ViewData["html"] = usuario.GetAdaptiveCard().Html;
                 ViewData["id"] = usuario.id;
             }
             else
