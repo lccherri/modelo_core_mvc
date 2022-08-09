@@ -27,7 +27,7 @@ namespace modelo_core_mvc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string[] initialScopes = Configuration.GetValue<string>("CallApi:ScopeForAccessToken")?.Split(' ').ToArray();
+            services.AddApplicationInsightsTelemetry();
 
             IdentityConfig identityConfig = new IdentityConfig(Configuration);
             var opcoesAutenticacao = identityConfig.AuthenticationOptions;
@@ -36,6 +36,7 @@ namespace modelo_core_mvc
             {
                 case "azuread":
                     services.AddControllersWithViews().AddMicrosoftIdentityUI();
+                    string[] initialScopes = Configuration.GetValue<string>("CallApi:ScopeForAccessToken")?.Split(' ').ToArray();
                     services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
                             .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
                             .AddInMemoryTokenCaches();
@@ -60,9 +61,7 @@ namespace modelo_core_mvc
                     break;
             }
 
-            services.AddApplicationInsightsTelemetry(Configuration["ApplicationInsights:ConnectionString"]);
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
-
             services.AddHttpClient<ProjetosApiClient>();
             services.AddTransient<AzureUtil>();
             services.AddTransient<ListModel>();
