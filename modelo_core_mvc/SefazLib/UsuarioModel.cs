@@ -2,6 +2,7 @@
 using AdaptiveCards.Rendering.Html;
 using AdaptiveCards.Templating;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
@@ -61,7 +62,7 @@ namespace SefazLib.usuarios
             return JsonConvert.DeserializeObject<IEnumerable<Usuario>>(UsuarioJson);
         }
 
-        public RenderedAdaptiveCard AdaptiveCard()
+        public RenderedAdaptiveCard GetAdaptiveCard()
         {
             var templateJson = @"
                                  {
@@ -111,15 +112,18 @@ namespace SefazLib.usuarios
             AdaptiveCardTemplate template = new AdaptiveCardTemplate(templateJson);
             var textoTemplate = template.Expand(this);
 
-            //Exemplo copiado de https://docs.microsoft.com/en-us/adaptive-cards/sdk/rendering-cards/net-html/render-a-card
-            AdaptiveCardRenderer renderer = new AdaptiveCardRenderer();
+            var jObject = JObject.Parse(textoTemplate);
+            if (!jObject.TryGetValue("version", out var _))
+                jObject["version"] = "0.5";
 
-            AdaptiveCard card = new AdaptiveCard(renderer.SupportedSchemaVersion)
-            {
-                Body = { new AdaptiveTextBlock() { Text = textoTemplate } }
-            };
 
+            // Parse the Adaptive Card JSON
+            AdaptiveCardParseResult parseResult = AdaptiveCard.FromJson(jObject.ToString());
+            AdaptiveCard card = parseResult.Card;
+
+            AdaptiveCardRenderer renderer = new();
             RenderedAdaptiveCard renderedCard = renderer.RenderCard(card);
+            var html = renderedCard.Html;
 
             return renderedCard;
         }

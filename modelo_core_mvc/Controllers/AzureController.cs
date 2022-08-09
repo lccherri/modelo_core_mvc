@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SefazLib.AzureUtils;
 using modelo_core_mvc.Models;
+using SefazLib.usuarios;
 
 namespace modelo_core_mvc.Controllers
 {
@@ -31,6 +32,10 @@ namespace modelo_core_mvc.Controllers
 
             GraphServiceClient graphClientDelegated = await azureUtil.ObterGraphClientDelegatedAsync();
 
+            Usuario usuario = await azureUtil.GetUserAsync();
+            ViewData["html"] = usuario.GetAdaptiveCard().Html;
+            ViewData["id"] = usuario.id;
+
             ViewData["login"] = azureUtil.jwtToken["upn"];
             ViewData["nome"] = azureUtil.jwtToken["name"];
             ViewData["scp"] = azureUtil.jwtToken["scp"];
@@ -45,8 +50,8 @@ namespace modelo_core_mvc.Controllers
         {
             GraphServiceClient graphClient = await azureUtil.ObterGraphClientApplicationAsync();
             ViewData["app_name"] = azureUtil.jwtToken["app_displayname"];
-            ViewData["roles"]    = azureUtil.jwtToken["roles"];
-            ViewData["token"]    = azureUtil.graphToken;
+            ViewData["roles"] = azureUtil.jwtToken["roles"];
+            ViewData["token"] = azureUtil.graphToken;
 
             var lista = new List<ListModel>();
 

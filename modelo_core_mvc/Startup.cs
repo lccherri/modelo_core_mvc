@@ -10,7 +10,6 @@ using SefazLib.IdentityCfg;
 using SefazLib.AzureUtils;
 using modelo_core_mvc.ProjetosApi;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc;
 using modelo_core_mvc.Models;
 
 namespace modelo_core_mvc
