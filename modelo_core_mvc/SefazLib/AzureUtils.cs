@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Diagnostics;
 using System.Net.Http.Headers;
 using SefazLib.usuarios;
 
@@ -19,7 +18,6 @@ namespace SefazLib.AzureUtils
     public class AzureUtil
     {
         public HttpClient httpClient;
-        public string graphToken;
         public Dictionary<string, string> jwtToken;
         private readonly IConfiguration configuration;
         private readonly string tenantId;
@@ -49,24 +47,14 @@ namespace SefazLib.AzureUtils
         }
 
         //Preparação do http ara autenticacao de api
-        public async Task<AuthenticationHeaderValue> AuthenticationHeader()
+        public async Task<AuthenticationHeaderValue> AuthenticationHeader(string[] scopes)
         {
             if (configuration["identity:type"] == "azuread")
             {
-                string[] initialScopes = configuration.GetValue<string>("CallApi:ScopeForAccessToken")?.Split(' ').ToArray();
-                string accessToken = "";
-                try
-                {
-                    accessToken = await tokenAcquisition.GetAccessTokenForUserAsync(initialScopes);
-                }
-                catch (System.Exception e)
-                {
-                    Debug.WriteLine(e.Message);
-                    throw;
-                }
+                if (!scopes.Any()) { scopes = configuration.GetValue<string>("CallApi:ScopeForAccessToken")?.Split(' ').ToArray(); }
+                var accessToken = await obterAccessToken(scopes, null);
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            };
-
+            }
             return httpClient.DefaultRequestHeaders.Authorization;
         }
 
@@ -74,6 +62,8 @@ namespace SefazLib.AzureUtils
         {
             if (configuration["identity:type"] == "azuread")
             {
+                string[] scopes = { "User.Read" };
+                var accessToken = await obterAccessToken(scopes, null);
                 string fotoUsuario = null;
                 Microsoft.Graph.User userAzure;
                 try
@@ -99,13 +89,13 @@ namespace SefazLib.AzureUtils
                 }
                 catch (System.Exception)
                 {
-                    GraphServiceClient graphClientApplication = await ObterGraphClientApplicationAsync();
+                    GraphServiceClient graphClientApplication = ObterGraphClientApplication();
                     userAzure = await graphClientApplication.Me
                         .Request()
                         .GetAsync();
                 }
 
-                return new Usuario(userAzure.Id, userAzure.GivenName, userAzure.DisplayName, userAzure.JobTitle, userAzure.Mail, fotoUsuario); 
+                return new Usuario(userAzure.Id, userAzure.GivenName, userAzure.DisplayName, userAzure.JobTitle, userAzure.Mail, fotoUsuario, accessToken);
             }
             else
             {
@@ -114,53 +104,51 @@ namespace SefazLib.AzureUtils
 
         }
 
-        public async Task<GraphServiceClient> ObterGraphClientApplicationAsync()
+        public GraphServiceClient ObterGraphClientApplication()
         {
-            string[] scopes = configuration.GetValue<string>("CallApi:MicrosoftGraphDefault")?.Split(' ').ToArray();
-
-            var options = new TokenCredentialOptions
-            {
-                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
-            };
-
+            string[] scopes = { "https://graph.microsoft.com/.default" };
+            var options = new TokenCredentialOptions { AuthorityHost = AzureAuthorityHosts.AzurePublicCloud };
             ClientSecretCredential clientSecretCredential = new ClientSecretCredential(tenantId,
                                                                     clientId,
                                                                     clientSecret,
                                                                     options);
-
-            await obterGraphToken(scopes, clientSecretCredential);
-
             return new GraphServiceClient(clientSecretCredential, scopes);
         }
 
         public async Task<GraphServiceClient> ObterGraphClientDelegatedAsync()
         {
             var scopes = new[] { "User.Read" };
-            await obterGraphToken(scopes, null);
-
+            ;
             var authProvider = new DelegateAuthenticationProvider(async (request) =>
             {
                 request.Headers.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", graphToken);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await obterAccessToken(scopes, null));
             });
-
             return new GraphServiceClient(authProvider);
         }
 
-        private async Task<string> obterGraphToken(string[] scopes, ClientSecretCredential clientSecretCredential)
+        public async Task<GraphServiceClient> ObterGraphClientHttpAsync()
         {
+            var scopes = new[] { "User.Read" };
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await obterAccessToken(scopes, null));
+            return new GraphServiceClient(httpClient);
+        }
+
+        private async Task<string> obterAccessToken(string[] scopes, ClientSecretCredential clientSecretCredential)
+        {
+            string accessToken;
             if (clientSecretCredential is null)
             {
-                graphToken = await tokenAcquisition.GetAccessTokenForUserAsync(scopes);
+                accessToken = await tokenAcquisition.GetAccessTokenForUserAsync(scopes);
             }
             else
             {
-                graphToken = clientSecretCredential!.GetTokenAsync(new TokenRequestContext(scopes)).Result.Token;
+                accessToken = clientSecretCredential!.GetTokenAsync(new TokenRequestContext(scopes)).Result.Token;
             }
 
-            jwtToken = GetTokenInfo(graphToken);
+            jwtToken = GetTokenInfo(accessToken);
 
-            return graphToken;
+            return accessToken;
         }
 
         protected Dictionary<string, string> GetTokenInfo(string token)

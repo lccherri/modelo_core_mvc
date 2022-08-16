@@ -1,4 +1,21 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿const dropPerson      = document.querySelector('.drop-person');
+dropPerson.personDetails = {
+    displayName: $("#nomeExibicao").val(),
+    mail: $("#email").val(),
+    personImage: $("#foto").val()
+};
 
-// Write your JavaScript code.
+const secondPerson = document.querySelector('.my-second-person');
+secondPerson.personDetails = {
+    displayName: $("#nomeExibicao").val(),
+    mail: $("#email").val(),
+    personImage: $("#foto").val()
+};
+
+const otherPerson = document.querySelector('.my-other-person');
+otherPerson.personDetails = {
+    displayName: $("#nomeExibicao").val(),
+    mail: $("#email").val(),
+    personImage: $("#foto").val()
+};
+

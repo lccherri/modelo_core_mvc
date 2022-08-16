@@ -15,7 +15,7 @@ namespace modelo_core_mvc.Controllers
     {
         private readonly IConfiguration configuration;
         private readonly ProjetosApiClient api;
-        private readonly AzureUtil mSGraphUtil;
+        private readonly AzureUtil azureUtil;
 
         //Insercao de vulnerabilidades para teste de análise de código
         string username = "teste";
@@ -28,11 +28,11 @@ namespace modelo_core_mvc.Controllers
         }
         //Fim do teste
 
-        public HomeController(IConfiguration Configuration, ProjetosApiClient Api, AzureUtil MSGraphUtil)
+        public HomeController(IConfiguration Configuration, ProjetosApiClient Api, AzureUtil AzureUtil)
         {
             configuration = Configuration;
             api = Api;
-            mSGraphUtil = MSGraphUtil;
+            azureUtil = AzureUtil;
         }
 
         [Authorize]
@@ -40,9 +40,10 @@ namespace modelo_core_mvc.Controllers
         {
             if (configuration["identity:type"] == "azuread")
             {
-                Usuario usuario = await mSGraphUtil.GetUserAsync();
+                Usuario usuario = await azureUtil.GetUserAsync();
                 ViewData["html"] = usuario.GetAdaptiveCard().Html;
                 ViewData["id"] = usuario.id;
+                ViewData["token"] = usuario.graphToken;
             }
             else
             {

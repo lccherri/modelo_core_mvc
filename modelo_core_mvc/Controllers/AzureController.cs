@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SefazLib.AzureUtils;
 using modelo_core_mvc.Models;
-using SefazLib.usuarios;
 
 namespace modelo_core_mvc.Controllers
 {
@@ -28,18 +27,28 @@ namespace modelo_core_mvc.Controllers
         //Nesse tipo, é utilizada a autenticação do usuário para concessão de permissão
         public async Task<ViewResult> MSGraphDelegatedAsync()
         {
-            //"https://graph.microsoft.com/v1.0/sites/fazendaspgovbr.sharepoint.com/:/sites/PreparaConformes"
+            IGraphServiceSitesCollectionPage items;
+            GraphServiceClient graphClient;
+            try
+            {
+                graphClient = await azureUtil.ObterGraphClientHttpAsync();
+                items = await graphClient.Sites
+                        .Request()
+                        .GetAsync();
+            }
+            catch (System.Exception)
+            {
+                graphClient = await azureUtil.ObterGraphClientDelegatedAsync();
+                items = await graphClient.Sites
+                        .Request()
+                        .GetAsync();
+            }
 
-            GraphServiceClient graphClientDelegated = await azureUtil.ObterGraphClientDelegatedAsync();
-
-            Usuario usuario = await azureUtil.GetUserAsync();
-            ViewData["html"] = usuario.GetAdaptiveCard().Html;
-            ViewData["id"] = usuario.id;
-
-            ViewData["login"] = azureUtil.jwtToken["upn"];
-            ViewData["nome"] = azureUtil.jwtToken["name"];
-            ViewData["scp"] = azureUtil.jwtToken["scp"];
-            ViewData["token"] = azureUtil.graphToken;
+            var displayName = new List<string>();
+            foreach (var item in items)
+            {
+                displayName.Add(item.DisplayName);
+            }
 
             return View();
         }
@@ -48,50 +57,54 @@ namespace modelo_core_mvc.Controllers
         //Nesse tipo, é utilizada a autenticação da aplicação, com uso de Secret ou Certificate, para concessão de permissão
         public async Task<IActionResult> List()
         {
-            GraphServiceClient graphClient = await azureUtil.ObterGraphClientApplicationAsync();
-            ViewData["app_name"] = azureUtil.jwtToken["app_displayname"];
-            ViewData["roles"] = azureUtil.jwtToken["roles"];
-            ViewData["token"] = azureUtil.graphToken;
+            GraphServiceClient graphClient = azureUtil.ObterGraphClientApplication();
+
+            var items = await graphClient.Sites
+                    .Request()
+                    .GetAsync();
+
+            var displayName = new List<string>();
+            foreach (var item in items)
+            {
+                displayName.Add(item.DisplayName);
+            }
 
             var lista = new List<ListModel>();
-
-            var siteId = "fazendaspgovbr.sharepoint.com,6d117106-a0df-4b73-8834-99756806b907,37489eab-f4d0-4ad0-8031-886758dade5f";
-            ViewData["siteId"] = siteId;
-
-            var listaId = "2306a558-a803-4e25-955e-3136deed7c00";
-
-            var sites = graphClient.Sites;
-            var site = sites[siteId];
-
             try
             {
-                var colunas = await site.Lists[listaId].Columns
-                    .Request()
-                    .GetAsync();
+                //var listaGraph = root.Lists[0];
+                //SiteWithPath("PreparaConformes").
+                //GetByPath("/Lists/FotosDiligencias");
 
-                string[] nomesColunas = new string[colunas.Count];
-                foreach (ColumnDefinition column in colunas)
-                {
-                    nomesColunas[colunas.IndexOf(column)] = column.Name;
-                }
+                //var colunas = await site.Lists[listaId].Columns
+                //var colunas = listaGraph.
+                //              Columns
+                //              .Request()
+                //              .GetAsync();
 
-                var drives = await site.Drives
-                    .Request()
-                    .GetAsync();
+                //string[] nomesColunas = new string[colunas.Count];
+                //foreach (ColumnDefinition column in colunas)
+                //{
+                //    nomesColunas[colunas.IndexOf(column)] = column.Name;
+                //}
 
-                var queryOptions = new List<QueryOption>() { new QueryOption("expand", "fields(select=Item,Title,Attachemnts,teste)") };
-                var items = await site.Lists[listaId].Items.Request(queryOptions).GetAsync();
-                foreach (var item in items)
-                {
-                    var valores = new List<string>();
-                    foreach (var dado in item.Fields.AdditionalData)
-                    {
-                        valores.Add(dado.Value.ToString());
-                    }
-                    lista.Add(new ListModel(valores[1], valores[2]));
-                }
+                //var drives = await site.Drives
+                //    .Request()
+                //    .GetAsync();
 
-                ViewData["mensagem"] = string.Format("Itens da lista {0}", site.Lists[listaId]);
+                //var queryOptions = new List<QueryOption>() { new QueryOption("expand", "fields(select=Item,Title,Attachemnts,teste)") };
+                //var items = await listaGraph.Items.Request(queryOptions).GetAsync();
+                //foreach (var item in items)
+                //{
+                //    var valores = new List<string>();
+                //    foreach (var dado in item.Fields.AdditionalData)
+                //    {
+                //        valores.Add(dado.Value.ToString());
+                //    }
+                //    listaGraph.Add(new ListModel(valores[1], valores[2]));
+                //}
+
+                //ViewData["mensagem"] = string.Format("Itens da lista {0}", site.Lists[listaId]);
             }
             catch (System.Exception e)
             {
@@ -99,6 +112,25 @@ namespace modelo_core_mvc.Controllers
             }
 
             return View(lista);
+        }
+
+        //Chamada do MS Graph com permission do tipo Application
+        //Nesse tipo, é utilizada a autenticação da aplicação, com uso de Secret ou Certificate, para concessão de permissão
+        public async Task<IActionResult> MSGraphApplicationAsync()
+        {
+            GraphServiceClient graphClient = azureUtil.ObterGraphClientApplication();
+
+            var items = await graphClient.Sites
+                    .Request()
+                    .GetAsync();
+
+            var displayName = new List<ListModel>();
+            foreach (var item in items)
+            {
+                displayName.Add(new ListModel(item.DisplayName, item.Id));
+            }
+
+            return View(displayName);
         }
 
         [HttpGet]

@@ -1,13 +1,15 @@
 ﻿@using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
 
-<script src="https://unpkg.com/adaptivecards-designer/dist/adaptivecards-designer.js"></script>
+@Html.Hidden("nomeExibicao", @ViewData["Nome"])
+@Html.Hidden("mail", @ViewData["Login"])
+@Html.Hidden("foto", @ViewData["Foto"])
 
 <h1>@ViewData["Message"]</h1>
 <div aria-label="breadcrumb" role="link">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a asp-area="" asp-controller="Azure" asp-action="MSGraphDelegated">MSGraph - User</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a asp-area="" asp-controller="Azure" asp-action="MSGraphDelegated">MSGraph - Delegated</a></li>
     </ol>
 </div>
 
@@ -19,36 +21,5 @@
         <li>CallApi: @Configuration["CallApi:MicrosoftGraph"]</li>
     </ul>
     <p>______________________________________________</p>
-
-    <h2>Informações do token</h2>
-    <p>Login: @ViewData["login"]</p>
-    <p>Nome:  @ViewData["nome"]</p>
-    <p>scope:</p>
-    <p>@ViewData["scp"]</p>
-    <p>Token: @ViewData["token"]</p>
-    <p>______________________________________________</p>
-
-    <h1>Adaptive card:</h1>
-
-        <div class="login">
-            <mgt-msal2-provider client-id="@Configuration["AzureAd:ClientId"]"></mgt-msal2-provider>
-            <mgt-login></mgt-login>
-        </div>
-
-        <p>User Id: @ViewData["id"]</p>
-        <div class="mgt-person">
-            Card com Id:
-            <p>
-                <mgt-person user-id="@ViewData["id"]" view="twoLines"></mgt-person>
-            </p>
-            Card com hover:
-            <p>
-                <mgt-person class="my-person" view="twoLines" line2-property="title" person-card="hover" fetch-image> </mgt-person>
-            </p>
-        </div>
-
-        <div>
-            <p>Html</p>
-            @Html.Raw(@ViewData["html"])
-        </div>
 </section>
+

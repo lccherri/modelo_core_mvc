@@ -8,9 +8,9 @@ namespace modelo_core_mvc.Models
 {
     public class ListModel
     {
-        [Display(Name = "Cargo")]
+        [Display(Name = "Coluna 1")]
         public string coluna1 { get; set; }
-        [Display(Name = "teste")]
+        [Display(Name = "Coluna 2")]
         public string coluna2 { get; set; }
 
         public ListModel(string Coluna1, string Coluna2)

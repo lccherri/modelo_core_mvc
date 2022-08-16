@@ -1,17 +1,32 @@
 ﻿@using Microsoft.AspNetCore.Authentication
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
+@{
+    var nomeExibicao = "Não autenticado";
+    var email = "";
+    var foto = "url";
+    if (User.Identity.IsAuthenticated)
+    {
+        nomeExibicao = @User.Identity.Name.Split(":")[0];
+    }
+}
+
+@Html.Hidden("nomeExibicao", @nomeExibicao)
+@Html.Hidden("mail", @email)
+@Html.Hidden("foto", @foto)
 
 <div class="dropdown menu_popup_drop">
 
-    <i id="botao_popup" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" alt="Menu de informações do sistema">
+    <i id="botao_popup" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" alt="Menu de acesso e informações do sistema">
         <mgt-person person-query="me"></mgt-person>
     </i>
+
     <ul class="dropdown-menu drp-mnu">
         <li>
             <em class="fas fa-mail-bulk"></em>
             <a asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
         </li>
+
         @if (Configuration["identity:type"] == "azuread")
         {
             <li>
@@ -21,6 +36,10 @@
             <li>
                 <em class="fas fa-project-diagram"></em>
                 <a asp-area="" asp-controller="Azure" asp-action="MSGraphDelegated">MSGraph - Del</a>
+            </li>
+            <li>
+                <em class="fas fa-project-diagram"></em>
+                <a asp-area="" asp-controller="Azure" asp-action="MSGraphApplication">MSGraph - App</a>
             </li>
         }
         <li>
@@ -47,5 +66,14 @@
                 <a asp-area="" asp-controller="Home" asp-action="Entrar">Entrar</a>
             </li>
         }
+        <li class="quebra_linha"></li>
+        <mgt-person class="drop-person"
+                    view="threelines"
+                    person-card="hover"
+                    line1-property="displayName"
+                    line2-property="mail"
+                    line3-property="userId"
+                    fetch-image>
+        </mgt-person>
     </ul>
 </div>

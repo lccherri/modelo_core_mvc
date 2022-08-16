@@ -4,9 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
 using modelo_core_mvc.projetos;
-using System.Diagnostics;
-using Microsoft.Identity.Web;
-using System.Linq;
 using SefazLib.AzureUtils;
 
 namespace modelo_core_mvc.ProjetosApi
@@ -14,15 +11,14 @@ namespace modelo_core_mvc.ProjetosApi
     public class ProjetosApiClient
     {
         private readonly IConfiguration configuration;
-        private readonly AzureUtil mSGraphUtil;
-        private readonly string url;
+        private readonly AzureUtil azureUtil;
 
         public HttpClient httpClient { get; set; }
 
-        public ProjetosApiClient(HttpClient HttpClient, IConfiguration Configuration, AzureUtil MSGraphUtil)
+        public ProjetosApiClient(HttpClient HttpClient, IConfiguration Configuration, AzureUtil AzureUtil)
         {
             configuration = Configuration;  
-            mSGraphUtil = MSGraphUtil;
+            azureUtil = AzureUtil;
             httpClient = HttpClient;
             httpClient.BaseAddress = new System.Uri(configuration["apiendereco:projetos"]);
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -31,7 +27,7 @@ namespace modelo_core_mvc.ProjetosApi
         //Consultar
         public async Task<ProjetosModel> GetProjetoAsync(long cd_projeto)
         {
-            httpClient.DefaultRequestHeaders.Authorization = await mSGraphUtil.AuthenticationHeader();
+            httpClient.DefaultRequestHeaders.Authorization = await azureUtil.AuthenticationHeader(null);
             var resposta = await httpClient.GetAsync($"Projetos/{cd_projeto}");
             resposta.EnsureSuccessStatusCode();
             return new ProjetosModel().ToModel(await resposta.Content.ReadAsStringAsync());
@@ -65,7 +61,7 @@ namespace modelo_core_mvc.ProjetosApi
         {
             if (cd_projeto != 0)
             {
-                httpClient.DefaultRequestHeaders.Authorization = await mSGraphUtil.AuthenticationHeader();
+                httpClient.DefaultRequestHeaders.Authorization = await azureUtil.AuthenticationHeader(null);
                 var resposta = await httpClient.DeleteAsync($"Projetos/{cd_projeto}");
                 resposta.EnsureSuccessStatusCode();
             }
@@ -74,7 +70,7 @@ namespace modelo_core_mvc.ProjetosApi
         //Incluir
         public async Task PostProjetoAsync(ProjetosModel projeto)
         {
-            httpClient.DefaultRequestHeaders.Authorization = await mSGraphUtil.AuthenticationHeader();
+            httpClient.DefaultRequestHeaders.Authorization = await azureUtil.AuthenticationHeader(null);
             var resposta = await httpClient.PostAsync("Projetos", projeto.ToJson());
             resposta.EnsureSuccessStatusCode();
         }
@@ -82,7 +78,7 @@ namespace modelo_core_mvc.ProjetosApi
         //Alterar
         public async Task PutProjetoAsync(ProjetosModel projeto)
         {
-            httpClient.DefaultRequestHeaders.Authorization = await mSGraphUtil.AuthenticationHeader();
+            httpClient.DefaultRequestHeaders.Authorization = await azureUtil.AuthenticationHeader(null);
             var resposta = await httpClient.PutAsync("Projetos", projeto.ToJson());
             if (!resposta.IsSuccessStatusCode)
             {
