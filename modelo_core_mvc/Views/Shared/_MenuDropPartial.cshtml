@@ -1,24 +1,34 @@
 ﻿@using Microsoft.AspNetCore.Authentication
 @using Microsoft.Extensions.Configuration
+@using SefazLib.usuarios
+@using SefazLib.AzureUtils;
+@inject AzureUtil azureUtil;
 @inject IConfiguration Configuration
 @{
-    var nomeExibicao = "Não autenticado";
-    var email = "";
-    var foto = "url";
+    var nomeExibicao = "Não Autenticado";
     if (User.Identity.IsAuthenticated)
     {
         nomeExibicao = @User.Identity.Name.Split(":")[0];
+        if (Configuration["identity:type"] == "azuread")
+        {
+            try
+            {
+                Usuario usuario = await azureUtil.GetUserAsync();
+                nomeExibicao = usuario.nomeCompleto;
+            }
+            catch { }
+        }
     }
 }
 
-@Html.Hidden("nomeExibicao", @nomeExibicao)
-@Html.Hidden("mail", @email)
-@Html.Hidden("foto", @foto)
+@Html.Hidden("nomeExibicao", nomeExibicao)
 
-<div class="dropdown menu_popup_drop">
+<div class="dropdown">
 
     <i id="botao_popup" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" alt="Menu de acesso e informações do sistema">
-        <mgt-person person-query="me"></mgt-person>
+        <mgt-person class="drop-person"
+                    line1-property="displayName">
+        </mgt-person>
     </i>
 
     <ul class="dropdown-menu drp-mnu">
@@ -27,21 +37,6 @@
             <a asp-area="" asp-controller="Home" asp-action="Contato">Contato</a>
         </li>
 
-        @if (Configuration["identity:type"] == "azuread")
-        {
-            <li>
-                <em class="fas fa-project-diagram"></em>
-                <a asp-area="" asp-controller="Azure" asp-action="List">Lista SharePoint</a>
-            </li>
-            <li>
-                <em class="fas fa-project-diagram"></em>
-                <a asp-area="" asp-controller="Azure" asp-action="MSGraphDelegated">MSGraph - Del</a>
-            </li>
-            <li>
-                <em class="fas fa-project-diagram"></em>
-                <a asp-area="" asp-controller="Azure" asp-action="MSGraphApplication">MSGraph - App</a>
-            </li>
-        }
         <li>
             <em class="fas fa-id-card"></em>
             <a asp-area="" asp-controller="Home" asp-action="TesteIdentity">Teste do Identity</a>
@@ -66,14 +61,5 @@
                 <a asp-area="" asp-controller="Home" asp-action="Entrar">Entrar</a>
             </li>
         }
-        <li class="quebra_linha"></li>
-        <mgt-person class="drop-person"
-                    view="threelines"
-                    person-card="hover"
-                    line1-property="displayName"
-                    line2-property="mail"
-                    line3-property="userId"
-                    fetch-image>
-        </mgt-person>
     </ul>
 </div>

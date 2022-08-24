@@ -18,7 +18,10 @@ namespace SefazLib.AzureUtils
     public class AzureUtil
     {
         public HttpClient httpClient;
-        public Dictionary<string, string> jwtToken;
+        public string jwtToken;
+        public string erro;
+        public string[] scopes;
+        public Dictionary<string, string> tokenInfo;
         private readonly IConfiguration configuration;
         private readonly string tenantId;
         private readonly string clientId;
@@ -46,29 +49,50 @@ namespace SefazLib.AzureUtils
             tenantId = Configuration["AzureAd:TenantId"];
         }
 
+        private async Task<string> obterAccessToken(ClientSecretCredential clientSecretCredential)
+        {
+            try
+            {
+                if (clientSecretCredential is null)
+                {
+                    jwtToken = await tokenAcquisition.GetAccessTokenForUserAsync(scopes);
+                }
+                else
+                {
+                    jwtToken = clientSecretCredential!.GetTokenAsync(new TokenRequestContext(scopes)).Result.Token;
+                }
+                tokenInfo = GetTokenInfo(jwtToken);
+            }
+            catch (Exception ex)
+            {
+                erro = ex.Message;
+            }
+            return jwtToken;
+        }
+
         //Preparação do http ara autenticacao de api
-        public async Task<AuthenticationHeaderValue> AuthenticationHeader(string[] scopes)
+        public async Task<AuthenticationHeaderValue> AuthenticationHeader()
         {
             if (configuration["identity:type"] == "azuread")
             {
-                if (!scopes.Any()) { scopes = configuration.GetValue<string>("CallApi:ScopeForAccessToken")?.Split(' ').ToArray(); }
-                var accessToken = await obterAccessToken(scopes, null);
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await obterAccessToken(null));
             }
             return httpClient.DefaultRequestHeaders.Authorization;
         }
 
+        public void SetScope(string callApi)
+        {
+            scopes = configuration.GetValue<string>("CallApi:" + callApi)?.Split(' ').ToArray();
+        }
         public async Task<Usuario> GetUserAsync()
         {
             if (configuration["identity:type"] == "azuread")
             {
-                string[] scopes = { "User.Read" };
-                var accessToken = await obterAccessToken(scopes, null);
                 string fotoUsuario = null;
                 Microsoft.Graph.User userAzure;
                 try
                 {
-                    GraphServiceClient graphClientDelegated = await ObterGraphClientDelegatedAsync();
+                    GraphServiceClient graphClientDelegated = await ObterGraphClientAsync("");
                     userAzure = await graphClientDelegated.Me
                         .Request()
                         .GetAsync();
@@ -82,20 +106,19 @@ namespace SefazLib.AzureUtils
                             fotoUsuario = Convert.ToBase64String(photoByte);
                         }
                     }
-                    catch (System.Exception)
+                    catch (System.Exception ex)
                     {
                         fotoUsuario = null;
+                        erro = ex.Message;
                     }
+                    return new Usuario(userAzure.Id, userAzure.GivenName, userAzure.DisplayName, userAzure.JobTitle, userAzure.Mail, fotoUsuario, jwtToken);
                 }
-                catch (System.Exception)
+                catch (System.Exception ex)
                 {
-                    GraphServiceClient graphClientApplication = ObterGraphClientApplication();
-                    userAzure = await graphClientApplication.Me
-                        .Request()
-                        .GetAsync();
+                    erro = ex.Message;
+                    return new Usuario();
                 }
 
-                return new Usuario(userAzure.Id, userAzure.GivenName, userAzure.DisplayName, userAzure.JobTitle, userAzure.Mail, fotoUsuario, accessToken);
             }
             else
             {
@@ -104,51 +127,27 @@ namespace SefazLib.AzureUtils
 
         }
 
-        public GraphServiceClient ObterGraphClientApplication()
+        public async Task<GraphServiceClient> ObterGraphClientAsync(string tipoClient)
         {
-            string[] scopes = { "https://graph.microsoft.com/.default" };
-            var options = new TokenCredentialOptions { AuthorityHost = AzureAuthorityHosts.AzurePublicCloud };
-            ClientSecretCredential clientSecretCredential = new ClientSecretCredential(tenantId,
-                                                                    clientId,
-                                                                    clientSecret,
-                                                                    options);
-            return new GraphServiceClient(clientSecretCredential, scopes);
-        }
-
-        public async Task<GraphServiceClient> ObterGraphClientDelegatedAsync()
-        {
-            var scopes = new[] { "User.Read" };
-            ;
-            var authProvider = new DelegateAuthenticationProvider(async (request) =>
+            switch (tipoClient)
             {
-                request.Headers.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await obterAccessToken(scopes, null));
-            });
-            return new GraphServiceClient(authProvider);
-        }
+                case "Application":
+                    return new GraphServiceClient(new ClientSecretCredential(tenantId, clientId, clientSecret));
 
-        public async Task<GraphServiceClient> ObterGraphClientHttpAsync()
-        {
-            var scopes = new[] { "User.Read" };
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await obterAccessToken(scopes, null));
-            return new GraphServiceClient(httpClient);
-        }
+                case "Http":
+                    SetScope("MSGraph");
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await obterAccessToken(null));
+                    return new GraphServiceClient(httpClient, "https://graph.microsoft.com/v1.0");
 
-        private async Task<string> obterAccessToken(string[] scopes, ClientSecretCredential clientSecretCredential)
-        {
-            string accessToken;
-            if (clientSecretCredential is null)
-            {
-                accessToken = await tokenAcquisition.GetAccessTokenForUserAsync(scopes);
+                default:
+                    SetScope("MSGraph");
+                    var authProvider = new DelegateAuthenticationProvider(async (request) =>
+                    {
+                        request.Headers.Authorization =
+                            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await obterAccessToken(null));
+                    });
+                    return new GraphServiceClient(authProvider);
             }
-            else
-            {
-                accessToken = clientSecretCredential!.GetTokenAsync(new TokenRequestContext(scopes)).Result.Token;
-            }
-
-            jwtToken = GetTokenInfo(accessToken);
-
-            return accessToken;
         }
 
         protected Dictionary<string, string> GetTokenInfo(string token)
@@ -168,6 +167,64 @@ namespace SefazLib.AzureUtils
             }
 
             return TokenInfo;
+        }
+
+        public async Task<string> buscaSiteId(string siteNome)
+        {
+            var graphClient = await ObterGraphClientAsync("Delegated");
+            var requests = new List<SearchRequestObject>()
+            {
+                new SearchRequestObject
+                {
+                    EntityTypes = new List<EntityType>()
+                    {
+                        EntityType.Site
+                    },
+                    Query = new SearchQuery
+                    {
+                        QueryString = siteNome
+                    },
+                    From = 0,
+                    Size = 25
+                }
+            };
+
+            var result = await graphClient.Search
+                    .Query(requests)
+                    .Request()
+                    .PostAsync();
+
+            string siteId = "";
+            if ((result.CurrentPage.Count > 0) && (result.CurrentPage[0].HitsContainers.Count() > 0))
+            {
+                var hitContainer = result.CurrentPage[0].HitsContainers.First();
+                if (hitContainer.Hits != null)
+                {
+                    foreach (var hit in hitContainer.Hits)
+                    {
+                        var recurso = await graphClient.Sites[hit.HitId].Request().GetAsync();
+                        siteId = hit.HitId;
+                        if (recurso.DisplayName == siteNome) { break; }
+                    }
+                }
+            }
+
+            return siteId;
+        }
+
+        public async Task<string> buscaListaId(string listaNome, string siteId)
+        {
+            var graphClient = await ObterGraphClientAsync("Delegated");
+            var items = await graphClient.Sites[siteId].Lists
+                                            .Request()
+                                            .GetAsync();
+            string listaId = "";
+            foreach (var item in items)
+            {
+                if (item.DisplayName == listaNome) { listaId = item.Id; break; }
+            }
+
+            return listaId;
         }
     }
 }

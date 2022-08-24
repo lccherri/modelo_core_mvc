@@ -10,8 +10,17 @@ namespace modelo_core_mvc.Models
     {
         [Display(Name = "Coluna 1")]
         public string coluna1 { get; set; }
-        [Display(Name = "Coluna 2")]
+        [Display(Name = "Titulo")]
         public string coluna2 { get; set; }
+        [Display(Name = "Numero")]
+        public double coluna3 { get; set; }
+
+        public ListModel(string Coluna1, string Coluna2, double Coluna3)
+        {
+            coluna1 = Coluna1;
+            coluna2 = Coluna2;
+            coluna3 = Coluna3;
+        }
 
         public ListModel(string Coluna1, string Coluna2)
         {

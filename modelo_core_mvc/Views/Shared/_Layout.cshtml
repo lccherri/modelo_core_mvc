@@ -9,11 +9,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="icon" type="image/png" href="~/img/faviconSP.png">
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link href="~/css/jqueryui/jquery-ui-1.10.1.custom.min.css" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="~/img/faviconSP.png">
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/font-awesome/css/all.css">
     <link rel="stylesheet" type="text/css" href="~/css/sefaz.css">
+    <link rel="stylesheet" type="text/css" href="~/css/site.css">
 
     @*Adaptive cards*@
     <script src="https://unpkg.com/@@microsoft/mgt/dist/bundle/mgt-loader.js"></script>
@@ -65,17 +67,20 @@
                         </a>
                     </li>
                     <li>
-                        <a href="http://etc.intra.fazenda.sp.gov.br/sites/dticia/Lists/Calendario/calendar.aspx" target="_blank">
-                            <em class="fas fa-calendar"></em>
-                            Calendário do CIA
-                        </a>
-                    </li>
-                    <li>
                         <a asp-area="" asp-controller="Home" asp-action="Privacidade">
                             <em class="fas fa-user-secret"></em>
                             Privacidade
                         </a>
                     </li>
+                    @if (Configuration["identity:type"] == "azuread")
+                    {
+                        <li>
+                            <a asp-area="" asp-controller="Azure" asp-action="List">
+                                <em class="fas fa-project-diagram"></em>
+                                MS Graph - Lista SharePoint
+                            </a>
+                        </li>
+                    }
                 </ul>
             </nav>
             <div id="btn-bars" class="col-1 no-gutter">

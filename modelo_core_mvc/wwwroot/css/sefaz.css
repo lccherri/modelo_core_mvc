@@ -281,7 +281,9 @@ span {
 #botao_popup {
     color: white;
     font-size: large;
-    margin-top: 3px;
+    margin-top: -1px;
+    padding-right: 0px;
+    min-height: 40px;
 }
 
 .menu_popup {
@@ -636,17 +638,17 @@ blockquote {
 }
 
 .tituloesquerda {
-    margin-top: 13px;
+    margin-top: 12px;
     left: 50px;
 }
 
 .titulocentro {
-    margin-top: 13px;
+    margin-top: 12px;
     text-align: center;
 }
 
 .titulodireita {
-    margin-top: 13px;
+    margin-top: 12px;
     text-align: right;
 }
 

@@ -1,12 +1,25 @@
 ﻿@using Microsoft.AspNetCore.Authentication
 @using modelo_core_mvc.Errors;
 @using Microsoft.Extensions.Configuration
+@using SefazLib.usuarios
+@using SefazLib.AzureUtils;
 @inject IConfiguration Configuration
+@inject AzureUtil azureUtil;
+
 @{
     var nomeExibicao = "Não autenticado";
     if (User.Identity.IsAuthenticated)
     {
         nomeExibicao = @User.Identity.Name.Split(":")[0];
+        if (Configuration["identity:type"] == "azuread")
+        {
+            try
+            {
+                Usuario usuario = await azureUtil.GetUserAsync();
+                nomeExibicao = usuario.nomeCompleto;
+            }
+            catch { }
+        }
     }
 }
 
@@ -24,11 +37,8 @@
     @if (Configuration["identity:type"] == "azuread")
     {
         <div>
-            <p>
-                Token: @ViewData["token"]
-            </p>
-            <p>Html</p>
             @Html.Raw(@ViewData["html"])
+            <div class="caixaTexto">Token: @ViewData["token"]</div>
         </div>
     }
     else

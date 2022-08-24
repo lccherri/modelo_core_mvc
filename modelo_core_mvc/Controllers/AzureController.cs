@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SefazLib.AzureUtils;
 using modelo_core_mvc.Models;
+using System.Linq;
 
 namespace modelo_core_mvc.Controllers
 {
@@ -21,105 +22,9 @@ namespace modelo_core_mvc.Controllers
             listModel = ListModel;
         }
 
-
-        [Authorize]
-        //Chamada do MS Graph com permission do tipo Delegated
-        //Nesse tipo, é utilizada a autenticação do usuário para concessão de permissão
-        public async Task<ViewResult> MSGraphDelegatedAsync()
-        {
-            IGraphServiceSitesCollectionPage items;
-            GraphServiceClient graphClient;
-            try
-            {
-                graphClient = await azureUtil.ObterGraphClientHttpAsync();
-                items = await graphClient.Sites
-                        .Request()
-                        .GetAsync();
-            }
-            catch (System.Exception)
-            {
-                graphClient = await azureUtil.ObterGraphClientDelegatedAsync();
-                items = await graphClient.Sites
-                        .Request()
-                        .GetAsync();
-            }
-
-            var displayName = new List<string>();
-            foreach (var item in items)
-            {
-                displayName.Add(item.DisplayName);
-            }
-
-            return View();
-        }
-
-        //Chamada do MS Graph com permission do tipo Application
-        //Nesse tipo, é utilizada a autenticação da aplicação, com uso de Secret ou Certificate, para concessão de permissão
-        public async Task<IActionResult> List()
-        {
-            GraphServiceClient graphClient = azureUtil.ObterGraphClientApplication();
-
-            var items = await graphClient.Sites
-                    .Request()
-                    .GetAsync();
-
-            var displayName = new List<string>();
-            foreach (var item in items)
-            {
-                displayName.Add(item.DisplayName);
-            }
-
-            var lista = new List<ListModel>();
-            try
-            {
-                //var listaGraph = root.Lists[0];
-                //SiteWithPath("PreparaConformes").
-                //GetByPath("/Lists/FotosDiligencias");
-
-                //var colunas = await site.Lists[listaId].Columns
-                //var colunas = listaGraph.
-                //              Columns
-                //              .Request()
-                //              .GetAsync();
-
-                //string[] nomesColunas = new string[colunas.Count];
-                //foreach (ColumnDefinition column in colunas)
-                //{
-                //    nomesColunas[colunas.IndexOf(column)] = column.Name;
-                //}
-
-                //var drives = await site.Drives
-                //    .Request()
-                //    .GetAsync();
-
-                //var queryOptions = new List<QueryOption>() { new QueryOption("expand", "fields(select=Item,Title,Attachemnts,teste)") };
-                //var items = await listaGraph.Items.Request(queryOptions).GetAsync();
-                //foreach (var item in items)
-                //{
-                //    var valores = new List<string>();
-                //    foreach (var dado in item.Fields.AdditionalData)
-                //    {
-                //        valores.Add(dado.Value.ToString());
-                //    }
-                //    listaGraph.Add(new ListModel(valores[1], valores[2]));
-                //}
-
-                //ViewData["mensagem"] = string.Format("Itens da lista {0}", site.Lists[listaId]);
-            }
-            catch (System.Exception e)
-            {
-                ViewData["mensagem"] = e.Message;
-            }
-
-            return View(lista);
-        }
-
-        //Chamada do MS Graph com permission do tipo Application
-        //Nesse tipo, é utilizada a autenticação da aplicação, com uso de Secret ou Certificate, para concessão de permissão
         public async Task<IActionResult> MSGraphApplicationAsync()
         {
-            GraphServiceClient graphClient = azureUtil.ObterGraphClientApplication();
-
+            var graphClient = await azureUtil.ObterGraphClientAsync("Application");
             var items = await graphClient.Sites
                     .Request()
                     .GetAsync();
@@ -131,6 +36,53 @@ namespace modelo_core_mvc.Controllers
             }
 
             return View(displayName);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> List()
+        {
+            var graphClient = await azureUtil.ObterGraphClientAsync("Delegated");
+
+            string siteId = await azureUtil.buscaSiteId("CA-DTI-CAP");
+            string listaId = await azureUtil.buscaListaId("Modelo_core", siteId);
+
+            var listaGraph = await graphClient
+                    .Sites[siteId]
+                    .Lists[listaId]
+                    .Columns
+                    .Request()
+                    .GetAsync();
+
+            var lista = new List<ListModel>();
+            if (listaGraph is not null)
+            {
+                var colunas = listaGraph;
+
+                string[] nomesColunas = new string[colunas.Count];
+                foreach (ColumnDefinition column in colunas)
+                {
+                    nomesColunas[colunas.IndexOf(column)] = column.Name;
+                }
+
+                var queryOptions = new List<QueryOption>() { new QueryOption("expand", "fields(select=Title,Coluna1,Numero)") };
+                var linhas = await graphClient
+                    .Sites[siteId]
+                    .Lists[listaId]
+                    .Items
+                    .Request(queryOptions)
+                    .GetAsync();
+
+                foreach (var linha in linhas)
+                {
+                    var valores = new List<string>();
+                    foreach (var dado in linha.Fields.AdditionalData)
+                    {
+                        valores.Add(dado.Value.ToString());
+                    }
+                    lista.Add(new ListModel(valores[2], valores[1], double.Parse(valores[3])));
+                }
+            }
+            return View(lista);
         }
 
         [HttpGet]

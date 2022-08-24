@@ -4,7 +4,7 @@
 @model IEnumerable<ListModel>
 
 @{
-    ViewData["Title"] = "Lista SharePoint";
+    ViewData["Title"] = "Exemplo de busca de uma Lista SharePoint pelo nome da lista e do site";
 }
 
 <h1>Lista</h1>
@@ -22,6 +22,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.coluna2)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.coluna3)
+            </th>
             <th>Operação</th>
         </tr>
     </thead>
@@ -34,6 +37,9 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.coluna2)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.coluna3)
                 </td>
                 <td>
                     <a asp-action="Alterar" class="btn btn-sucesso mr-1">Alterar</a> |
@@ -53,12 +59,3 @@
         <li>CallApi:  @Configuration["CallApi:MicrosoftGraph"]</li>
     </ul>
     <p>______________________________________________</p>
-
-    <h2>Informações do token</h2>
-    <p>App name: @ViewData["app_name"]</p>
-    <p>siteId:  @ViewData["siteId"]</p>
-    <p>Roles:</p>
-    <p>@ViewData["roles"]</p>
-    <p>Token: @ViewData["token"]</p>
-    <p>______________________________________________</p>
-

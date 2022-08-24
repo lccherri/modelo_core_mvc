@@ -19,6 +19,7 @@ namespace modelo_core_mvc.ProjetosApi
         {
             configuration = Configuration;  
             azureUtil = AzureUtil;
+            azureUtil.SetScope("ScopeForAccessToken");
             httpClient = HttpClient;
             httpClient.BaseAddress = new System.Uri(configuration["apiendereco:projetos"]);
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -27,7 +28,7 @@ namespace modelo_core_mvc.ProjetosApi
         //Consultar
         public async Task<ProjetosModel> GetProjetoAsync(long cd_projeto)
         {
-            httpClient.DefaultRequestHeaders.Authorization = await azureUtil.AuthenticationHeader(null);
+            httpClient.DefaultRequestHeaders.Authorization = await azureUtil.AuthenticationHeader();
             var resposta = await httpClient.GetAsync($"Projetos/{cd_projeto}");
             resposta.EnsureSuccessStatusCode();
             return new ProjetosModel().ToModel(await resposta.Content.ReadAsStringAsync());
@@ -61,7 +62,7 @@ namespace modelo_core_mvc.ProjetosApi
         {
             if (cd_projeto != 0)
             {
-                httpClient.DefaultRequestHeaders.Authorization = await azureUtil.AuthenticationHeader(null);
+                httpClient.DefaultRequestHeaders.Authorization = await azureUtil.AuthenticationHeader();
                 var resposta = await httpClient.DeleteAsync($"Projetos/{cd_projeto}");
                 resposta.EnsureSuccessStatusCode();
             }
@@ -70,7 +71,7 @@ namespace modelo_core_mvc.ProjetosApi
         //Incluir
         public async Task PostProjetoAsync(ProjetosModel projeto)
         {
-            httpClient.DefaultRequestHeaders.Authorization = await azureUtil.AuthenticationHeader(null);
+            httpClient.DefaultRequestHeaders.Authorization = await azureUtil.AuthenticationHeader();
             var resposta = await httpClient.PostAsync("Projetos", projeto.ToJson());
             resposta.EnsureSuccessStatusCode();
         }
@@ -78,7 +79,7 @@ namespace modelo_core_mvc.ProjetosApi
         //Alterar
         public async Task PutProjetoAsync(ProjetosModel projeto)
         {
-            httpClient.DefaultRequestHeaders.Authorization = await azureUtil.AuthenticationHeader(null);
+            httpClient.DefaultRequestHeaders.Authorization = await azureUtil.AuthenticationHeader();
             var resposta = await httpClient.PutAsync("Projetos", projeto.ToJson());
             if (!resposta.IsSuccessStatusCode)
             {

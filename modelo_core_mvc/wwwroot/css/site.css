@@ -69,3 +69,40 @@ body {
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
 }
+
+.caixaTexto {
+    word-break: break-word;
+    border: 1px solid #DDD;
+    font-weight: 500;
+    color: #000;
+    margin-top: 15px;
+    width: 100%;
+}
+
+/*  mgt - Microsoft Graph Template 
+    Botoes e paineis com informações do Microsoft Graph, quando utilizado.
+*/
+
+mgt-person {
+    --person-card-display-name-font-size: 40px;
+    --person-card-display-name-color: #ffffff;
+    --person-card-title-font-size: 25px;
+    --person-card-title-color: #ffffff;
+    --person-card-subtitle-font-size: 10px;
+    --person-card-subtitle-color: #ffffff;
+    --person-card-details-title-font-size: 10px;
+    --person-card-details-title-color: #b3bf0a;
+    --person-card-details-item-font-size: 20px;
+    --person-card-details-item-color: #3abf0a;
+    --person-card-background-color: #000000;
+    --person-card-contact-link-color: #ff0000;
+    --person-card-contact-link-hover-color: #00ff00;
+    --person-card-show-more-color: #ff0000;
+    --person-card-show-more-hover-color: #00ff00;
+    --person-card-base-links-color: #ff0000;
+    --person-card-base-links-hover-color: #00ff00;
+    --person-card-tab-nav-color: #ff0000;
+    --person-card-active-org-member-color: #ff0000;
+    --person-card-nav-back-arrow-hover-color: #00ff00;
+    --person-card-nav-back-arrow-color: #ff0000;
+}
