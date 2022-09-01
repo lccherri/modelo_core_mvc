@@ -1,18 +1,6 @@
 ﻿@using modelo_core_mvc.projetos;
 @model modelo_core_mvc.projetos.ProjetosModel
 
-<div aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-        <li class="breadcrumb-item"><a asp-area="" asp-controller="Projetos" asp-action="Index">Projetos</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a asp-area="" asp-controller="Projetos" asp-action="Detalhes">Detalhes</a></li>
-    </ol>
-</div>
-
-@{
-    ViewData["Title"] = "Projeto";
-}
-
 <h1>@ViewData["Message"]</h1>
 
 <div>

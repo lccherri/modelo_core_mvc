@@ -23,15 +23,6 @@
     }
 }
 
-@{
-    ViewData["Title"] = "Sefaz-SP";
-}
-<div aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a asp-area="" asp-controller="Home" asp-action="Sair">Sair</a></li>
-    </ol>
-</div>
 <section>
     <h1>Usuário autenticado:</h1>
     @if (Configuration["identity:type"] == "azuread")

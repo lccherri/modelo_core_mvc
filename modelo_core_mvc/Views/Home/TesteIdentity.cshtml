@@ -1,11 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Authentication
 <h1>@ViewData["Message"]</h1>
-<div aria-label="breadcrumb" role="link">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-        <li class="breadcrumb-item active" aria-current="page"><a asp-area="" asp-controller="Home" asp-action="TesteIdentity">Teste do Identity</a></li>
-    </ol>
-</div>
 
 <section>
     @if (!User.Identity.IsAuthenticated)

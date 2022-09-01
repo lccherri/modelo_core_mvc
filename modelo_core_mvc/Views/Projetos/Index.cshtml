@@ -1,56 +1,45 @@
 ﻿@using modelo_core_mvc.projetos;
 @model IEnumerable<ProjetosModel>
 
-    <div aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><a asp-area="" asp-controller="Projetos" asp-action="Index">Projetos</a></li>
-        </ol>
-    </div>
+<h1>@ViewData["Message"]</h1>
 
-    @{
-        ViewData["Title"] = "Projetos";
-    }
-
-    <h1>@ViewData["Message"]</h1>
-
-    <p>
-        <a asp-action="Adicionar" class="btn btn-regular mr-1">+ Adicionar Projeto</a>
-    </p>
-    <table class="table" >
-        <thead>
+<p>
+    <a asp-action="Adicionar" class="btn btn-regular mr-1">+ Adicionar Projeto</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.cd_projeto)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.nm_projeto)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ds_projeto)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
             <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.cd_projeto)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.nm_projeto)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ds_projeto)
-                </th>
-                <th></th>
+                <td>
+                    @Html.DisplayFor(modelItem => item.cd_projeto)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.nm_projeto)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ds_projeto)
+                </td>
+                <td>
+                    @Html.ActionLink("Alterar", "Alterar", new { item.cd_projeto }) |
+                    @Html.ActionLink("Detalhes", "Detalhes", new { item.cd_projeto }) |
+                    @Html.ActionLink("Excluir", "Excluir", new { item.cd_projeto })
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.cd_projeto)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.nm_projeto)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ds_projeto)
-                    </td>
-                    <td>
-                        @Html.ActionLink("Alterar", "Alterar", new { item.cd_projeto }) |
-                        @Html.ActionLink("Detalhes", "Detalhes", new { item.cd_projeto }) |
-                        @Html.ActionLink("Excluir", "Excluir", new { item.cd_projeto })
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+        }
+    </tbody>
+</table>

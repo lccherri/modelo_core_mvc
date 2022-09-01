@@ -6,12 +6,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SefazLib.AzureUtils;
 using modelo_core_mvc.Models;
-using System.Linq;
 
 namespace modelo_core_mvc.Controllers
 {
     //[AuthorizeForScopes(Scopes = new[] { "user.read" })]
-    public class AzureController : Controller
+    public class AzureController : BaseController
     {
         private readonly AzureUtil azureUtil;
         private ListModel listModel { get; set; }
@@ -22,27 +21,10 @@ namespace modelo_core_mvc.Controllers
             listModel = ListModel;
         }
 
-        public async Task<IActionResult> MSGraphApplicationAsync()
-        {
-            var graphClient = await azureUtil.ObterGraphClientAsync("Application");
-            var items = await graphClient.Sites
-                    .Request()
-                    .GetAsync();
-
-            var displayName = new List<ListModel>();
-            foreach (var item in items)
-            {
-                displayName.Add(new ListModel(item.DisplayName, item.Id));
-            }
-
-            return View(displayName);
-        }
-
         [Authorize]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> Index()
         {
             var graphClient = await azureUtil.ObterGraphClientAsync("Delegated");
-
             string siteId = await azureUtil.buscaSiteId("CA-DTI-CAP");
             string listaId = await azureUtil.buscaListaId("Modelo_core", siteId);
 
@@ -86,16 +68,16 @@ namespace modelo_core_mvc.Controllers
         }
 
         [HttpGet]
-        public ActionResult Adicionar()
+        public ActionResult AdicionarLinha()
         {
-            ViewData["Title"] = "Novo Projeto";
-            ViewData["Message"] = "Incluir novo projeto";
+            ViewData["Title"] = "Nova linha";
+            ViewData["Message"] = "Incluir nova linha na lista";
             return View(new ListModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Adicionar(ListModel model)
+        public ActionResult AdicionarLinha(ListModel model)
         {
             if (ModelState.IsValid)
             {
@@ -105,16 +87,16 @@ namespace modelo_core_mvc.Controllers
         }
 
         [HttpGet]
-        public ActionResult Alterar()
+        public ActionResult AlterarLinha()
         {
-            ViewData["Title"] = "Editar Projeto";
-            ViewData["Message"] = "Editar informações do projeto";
+            ViewData["Title"] = "Editar informações";
+            ViewData["Message"] = "Modificar as informações da linha";
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Alterar(ListModel model)
+        public ActionResult AlterarLinha(ListModel model)
         {
             if (ModelState.IsValid)
             {
@@ -124,16 +106,16 @@ namespace modelo_core_mvc.Controllers
         }
 
         [HttpGet]
-        public ActionResult Excluir()
+        public ActionResult ExcluirLinha()
         {
-            ViewData["Title"] = "Excluir Projeto";
-            ViewData["Message"] = "Exclusão do projeto";
+            ViewData["Title"] = "Excluir linha";
+            ViewData["Message"] = "Exclusão da linha";
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Excluir(ListModel model)
+        public ActionResult ExcluirLinha(ListModel model)
         {
             if (ModelState.IsValid)
             {

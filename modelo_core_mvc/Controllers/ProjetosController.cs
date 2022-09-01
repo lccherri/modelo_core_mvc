@@ -7,7 +7,7 @@ using modelo_core_mvc.ProjetosApi;
 namespace modelo_core_mvc.Controllers
 {
     [Authorize]
-    public class ProjetosController : Controller
+    public class ProjetosController : BaseController
     {
         private readonly ProjetosApiClient api;
 

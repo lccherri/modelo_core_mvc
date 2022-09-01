@@ -630,9 +630,6 @@ blockquote {
     background-color: #034ea2;
     color: #ffffff;
     font-size: 14px;
-    background-image: url(../img/flagTopo.png);
-    background-repeat: no-repeat;
-    background-position: left;
     top: 0;
     left: 0;
 }
@@ -643,13 +640,19 @@ blockquote {
 }
 
 .titulocentro {
-    margin-top: 12px;
+    margin-top: 14px;
     text-align: center;
 }
 
 .titulodireita {
-    margin-top: 12px;
+    margin-top: 14px;
     text-align: right;
+}
+
+img.brasaosp {
+    max-width: 40px;
+    margin-left: -65px;
+    margin-top: -12px;
 }
 
 .user-name {
@@ -1902,8 +1905,10 @@ a.no-border {
 }
 
 img.govsph-logo-rodape {
-    max-width: 160px;
+    max-width: 190px;
     height: auto;
+    margin-left: 20px;
+    margin-top: -20px;
 }
 
 div#govsp-links-footer {
@@ -1967,6 +1972,7 @@ li.govsp-link-rodape-lg {
     padding: 0;
     margin-top: -41px;
     margin-right: -19px;
+    height: auto;
 }
 
 @media only screen and (max-width:768px) {

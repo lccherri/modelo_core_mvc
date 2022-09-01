@@ -1,0 +1,41 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+<div id="sidebar" class="lateral">
+    <nav>
+        <ul class="list-unstyled components" id="menu">
+            <li>
+                <a asp-area="" asp-controller="Home" asp-action="Index">
+                    <em class='fas fa-home'></em>
+                    Home
+                </a>
+            </li>
+            <li>
+                <a asp-area="" asp-controller="Projetos" asp-action="Index">
+                    <em class="fas fa-table"></em>
+                    Lista de Projetos
+                </a>
+            </li>
+            <li>
+                <a asp-area="" asp-controller="Home" asp-action="Privacidade">
+                    <em class="fas fa-user-secret"></em>
+                    Privacidade
+                </a>
+            </li>
+            @if (Configuration["identity:type"] == "azuread")
+            {
+                <li>
+                    <a asp-area="" asp-controller="Azure" asp-action="Index">
+                        <em class="fas fa-project-diagram"></em>
+                        MS Graph - Lista SharePoint
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+    <div id="btn-bars" class="col-1 no-gutter">
+        <button type="button" id="sidebarCollapse" class="btn btn-retro">
+            <em class="fa fa-angle-double-left"></em><span class="txRetro"></span>
+        </button>
+    </div>
+</div>

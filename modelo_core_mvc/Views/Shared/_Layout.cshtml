@@ -8,19 +8,14 @@
     <title>@ViewData["Title"]</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <link href="~/css/jqueryui/jquery-ui-1.10.1.custom.min.css" rel="stylesheet" />
     <link rel="icon" type="image/png" href="~/img/faviconSP.png">
 
+    <link rel="stylesheet" href="~/css/jqueryui/jquery-ui-1.10.1.custom.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/font-awesome/css/all.css">
-    <link rel="stylesheet" type="text/css" href="~/css/sefaz.css">
-    <link rel="stylesheet" type="text/css" href="~/css/site.css">
+    <link rel="stylesheet" href="~/css/sefaz.css">
+    <link rel="stylesheet" href="~/css/site.css">
 
-    @*Adaptive cards*@
-    <script src="https://unpkg.com/@@microsoft/mgt/dist/bundle/mgt-loader.js"></script>
-    <script src="https://unpkg.com/adaptivecards-templating/dist/adaptivecards-templating.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="~/css/card.css">
 
     @*Application Insights*@
     <script type="text/javascript">
@@ -39,57 +34,11 @@
 </head>
 
 <body>
-    <header>
-        <div class="topo row">
-            <div class="tituloesquerda col-4 col-sm-5 col-md-6 col-lg-4">Secretaria da Fazenda e Planejamento</div>
-            <div class="titulocentro   col-6 col-sm-4 col-md-4 col-lg-4">Modelo Sefaz de aplicação Asp Net Core com Razor</div>
-            <div class="titulodireita  col-2 col-sm-3 col-md-2 col-lg-4">
-                <div class="user-name col-10"> <partial name="_LoginPartial" /> </div>
-                <div class="menu_popup col-2"> <partial name="_MenuDropPartial" /> </div>
-            </div>
-        </div>
-    </header>
+    <partial name="_Cabecalho" />
+    <partial name="_BreadCrumb" />
 
     <div class="conteudo">
-        <div id="sidebar" class="lateral">
-            <nav>
-                <ul class="list-unstyled components" id="menu">
-                    <li>
-                        <a asp-area="" asp-controller="Home" asp-action="Index">
-                            <em class='fas fa-home'></em>
-                            Home
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-area="" asp-controller="Projetos" asp-action="Index">
-                            <em class="fas fa-table"></em>
-                            Lista de Projetos
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-area="" asp-controller="Home" asp-action="Privacidade">
-                            <em class="fas fa-user-secret"></em>
-                            Privacidade
-                        </a>
-                    </li>
-                    @if (Configuration["identity:type"] == "azuread")
-                    {
-                        <li>
-                            <a asp-area="" asp-controller="Azure" asp-action="List">
-                                <em class="fas fa-project-diagram"></em>
-                                MS Graph - Lista SharePoint
-                            </a>
-                        </li>
-                    }
-                </ul>
-            </nav>
-            <div id="btn-bars" class="col-1 no-gutter">
-                <button type="button" id="sidebarCollapse" class="btn btn-retro">
-                    <em class="fa fa-angle-double-left"></em><span class="txRetro"></span>
-                </button>
-            </div>
-        </div>
-
+        <partial name="_MenuLateral" />
         <div id="content">
             <div class="container">
                 <main>
@@ -106,34 +55,8 @@
         </div>
     </div>
 
-    <footer>
-        <div id="govsp-rodape">
-            <div id="govsp-footerGlobal" role="navigation">
-                <ul class="govsph-links">
-                    <li class="govsp-link-rodape"><a class="govsp-links-footer" href="https://www.ouvidoria.sp.gov.br/Portal/Default.aspx" target="_blank">Ouvidoria</a></li>
-                    <li class="govsp-link-rodape"><a class="govsp-links-footer" href="http://www.transparencia.sp.gov.br/" target="_blank">Transparência</a></li>
-                    <li class="govsp-link-rodape"><a class="govsp-links-footer no-border" href="http://www.sic.sp.gov.br/" target="_blank">SIC</a></li>
-                    <li class="govsp-link-rodape-lg" tabindex="0"><img class="govsph-logo-rodape" src="~/img/logo-rodape.png" alt="Logotipo Governo do Estado de São Paulo" /></li>
-                    <li class="govsp-link-rodape-lg" tabindex="0"><img class="govsph-logo-rodape logo-negativo" src="~/img/logo-rodape-negativo.png" alt="Logotipo Governo do Estado de São Paulo" /></li>
-                </ul>
-            </div>
-            <div id="govsp-footer-bottom" class="govsp-azul"></div>
-        </div>
-    </footer>
-
-    <script src="~/js/script-cabecalho.js"></script>
-    <script src="~/js/script-contrast.js"></script>
-    <script src="~/js/script-tamanho-fonte.js"></script>
-    <script src="~/js/script-scroll.js"></script>
-    <script src="~/js/popper.min.js"></script>
-    <script src="~/js/highlight.pack.js"></script>
-    <script src="~/js/clipboard.min.js"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/jquery-ui-1.10.4.custom.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/js/sefaz.js"></script>
-
+    <partial name="_Rodape" />
+    <partial name="_Scripts" />
     @RenderSection("Scripts", required: false)
 </body>
 </html>

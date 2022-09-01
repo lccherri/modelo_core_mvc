@@ -11,7 +11,7 @@ using modelo_core_mvc.Errors;
 
 namespace modelo_core_mvc.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly IConfiguration configuration;
         private readonly ProjetosApiClient api;
@@ -68,6 +68,7 @@ namespace modelo_core_mvc.Controllers
 
         public IActionResult Index()
         {
+            @ViewData["Title"] = "Sefaz-SP";
             return View();
         }
 
