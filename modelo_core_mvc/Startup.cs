@@ -65,6 +65,7 @@ namespace modelo_core_mvc
             }
             #endregion
 
+            services.AddTransient<IdentityConfig>();
             services.AddTransient<AzureUtil>();
             services.AddHttpClient<ProjetosApiClient>();
         }

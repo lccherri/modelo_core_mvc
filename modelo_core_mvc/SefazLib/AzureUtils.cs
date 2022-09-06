@@ -1,89 +1,34 @@
-﻿using Azure.Core;
-using Azure.Identity;
-using Microsoft.Identity.Web;
+﻿using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.IdentityModel.Tokens.Jwt;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using SefazLib.usuarios;
+using SefazLib.IdentityCfg;
 
 namespace SefazLib.AzureUtils
 {
     public class AzureUtil
     {
         public HttpClient httpClient;
-        public string jwtToken;
         public string erro;
         public string[] scopes;
         public Dictionary<string, string> tokenInfo;
         private readonly IConfiguration configuration;
-        private readonly string tenantId;
-        private readonly string clientId;
-        private readonly string clientSecret;
-        private readonly ITokenAcquisition tokenAcquisition;
+        private readonly IdentityConfig identityConfig;
 
-        //Autenticação com AzureAD
-        public AzureUtil(IConfiguration Configuration, ITokenAcquisition TokenAcquisition)
+        public AzureUtil(IConfiguration Configuration, IdentityConfig IdentityConfig)
         {
             httpClient = new HttpClient();
             configuration = Configuration;
-            clientId = configuration["AzureAd:ClientId"];
-            clientSecret = configuration["AzureAd:ClientSecret"];
-            tenantId = configuration["AzureAd:TenantId"];
-            tokenAcquisition = TokenAcquisition;
+            identityConfig = IdentityConfig;
         }
 
-        //Autenticação sem AzureAD
-        public AzureUtil(IConfiguration Configuration)
-        {
-            httpClient = new HttpClient();
-            configuration = Configuration;
-            clientId = Configuration["AzureAd:ClientId"];
-            clientSecret = Configuration["AzureAd:ClientSecret"];
-            tenantId = Configuration["AzureAd:TenantId"];
-        }
-
-        private async Task<string> obterAccessToken(ClientSecretCredential clientSecretCredential)
-        {
-            try
-            {
-                if (clientSecretCredential is null)
-                {
-                    jwtToken = await tokenAcquisition.GetAccessTokenForUserAsync(scopes);
-                }
-                else
-                {
-                    jwtToken = clientSecretCredential!.GetTokenAsync(new TokenRequestContext(scopes)).Result.Token;
-                }
-                tokenInfo = GetTokenInfo(jwtToken);
-            }
-            catch (Exception ex)
-            {
-                erro = ex.Message;
-            }
-            return jwtToken;
-        }
-
-        //Preparação do http ara autenticacao de api
-        public async Task<AuthenticationHeaderValue> AuthenticationHeader()
-        {
-            if (configuration["identity:type"] == "azuread")
-            {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await obterAccessToken(null));
-            }
-            return httpClient.DefaultRequestHeaders.Authorization;
-        }
-
-        public void SetScope(string callApi)
-        {
-            scopes = configuration.GetValue<string>("CallApi:" + callApi)?.Split(' ').ToArray();
-        }
         public async Task<Usuario> GetUserAsync()
         {
             if (configuration["identity:type"] == "azuread")
@@ -111,7 +56,7 @@ namespace SefazLib.AzureUtils
                         fotoUsuario = null;
                         erro = ex.Message;
                     }
-                    return new Usuario(userAzure.Id, userAzure.GivenName, userAzure.DisplayName, userAzure.JobTitle, userAzure.Mail, fotoUsuario, jwtToken);
+                    return new Usuario(userAzure.Id, userAzure.GivenName, userAzure.DisplayName, userAzure.JobTitle, userAzure.Mail, fotoUsuario);
                 }
                 catch (System.Exception ex)
                 {
@@ -132,41 +77,22 @@ namespace SefazLib.AzureUtils
             switch (tipoClient)
             {
                 case "Application":
-                    return new GraphServiceClient(new ClientSecretCredential(tenantId, clientId, clientSecret));
+                    return new GraphServiceClient(new ClientSecretCredential(configuration["AzureAd:ClientId"], configuration["AzureAd:TenantId"], configuration["AzureAd:ClientSecret"]));
 
                 case "Http":
-                    SetScope("MSGraph");
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await obterAccessToken(null));
+                    identityConfig.SetScope("MSGraph");
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await identityConfig.obterAccessToken(null));
                     return new GraphServiceClient(httpClient, "https://graph.microsoft.com/v1.0");
 
                 default:
-                    SetScope("MSGraph");
+                    identityConfig.SetScope("MSGraph");
                     var authProvider = new DelegateAuthenticationProvider(async (request) =>
                     {
                         request.Headers.Authorization =
-                            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await obterAccessToken(null));
+                            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await identityConfig.obterAccessToken(null));
                     });
                     return new GraphServiceClient(authProvider);
             }
-        }
-
-        protected Dictionary<string, string> GetTokenInfo(string token)
-        {
-            var TokenInfo = new Dictionary<string, string>();
-
-            var handler = new JwtSecurityTokenHandler();
-            var jwtSecurityToken = handler.ReadJwtToken(token);
-            var claims = jwtSecurityToken.Claims.ToList();
-
-            foreach (var claim in claims)
-            {
-                if (!TokenInfo.ContainsKey(claim.Type))
-                {
-                    TokenInfo.Add(claim.Type, claim.Value);
-                }
-            }
-
-            return TokenInfo;
         }
 
         public async Task<string> buscaSiteId(string siteNome)

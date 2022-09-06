@@ -13,6 +13,11 @@ using SefazIdentity;
 using System.Net.Http;
 using System.Collections.Generic;
 using Microsoft.Identity.Web;
+using System.Net.Http.Headers;
+using Azure.Identity;
+using Azure.Core;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 
 namespace SefazLib.IdentityCfg
 {
@@ -123,7 +128,16 @@ namespace SefazLib.IdentityCfg
             };
         }
 
-        // Azure AD
+        public async Task<AuthenticationHeaderValue> AuthenticationHeader()
+        {
+            if (configuration["identity:type"] == "azuread")
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await obterAccessToken(null));
+            }
+            return httpClient.DefaultRequestHeaders.Authorization;
+        }
+
+        #region Azure AD
         public IdentityConfig(IConfiguration Configuration, ITokenAcquisition TokenAcquisition)
         {
             tokenAcquisition = TokenAcquisition;
@@ -147,6 +161,51 @@ namespace SefazLib.IdentityCfg
             };
 
         }
+
+        public void SetScope(string callApi)
+        {
+            scopes = configuration.GetValue<string>("CallApi:" + callApi)?.Split(' ').ToArray();
+        }
+
+        public async Task<string> obterAccessToken(ClientSecretCredential clientSecretCredential)
+        {
+            try
+            {
+                if (clientSecretCredential is null)
+                {
+                    jwtToken = await tokenAcquisition.GetAccessTokenForUserAsync(scopes);
+                }
+                else
+                {
+                    jwtToken = clientSecretCredential!.GetTokenAsync(new TokenRequestContext(scopes)).Result.Token;
+                }
+                tokenInfo = GetTokenInfo(jwtToken);
+            }
+            catch (Exception ex)
+            {
+                erro = ex.Message;
+            }
+            return jwtToken;
+        }
+        protected Dictionary<string, string> GetTokenInfo(string token)
+        {
+            var TokenInfo = new Dictionary<string, string>();
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwtSecurityToken = handler.ReadJwtToken(token);
+            var claims = jwtSecurityToken.Claims.ToList();
+
+            foreach (var claim in claims)
+            {
+                if (!TokenInfo.ContainsKey(claim.Type))
+                {
+                    TokenInfo.Add(claim.Type, claim.Value);
+                }
+            }
+
+            return TokenInfo;
+        }
+        #endregion
 
         public static async Task Logout(HttpContext httpContext, IConfiguration Configuration)
         {

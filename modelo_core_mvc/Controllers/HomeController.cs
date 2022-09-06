@@ -43,7 +43,6 @@ namespace modelo_core_mvc.Controllers
                 Usuario usuario = await azureUtil.GetUserAsync();
                 ViewData["html"] = usuario.GetAdaptiveCard().Html;
                 ViewData["id"] = usuario.id;
-                ViewData["token"] = usuario.graphToken;
             }
             else
             {

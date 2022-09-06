@@ -24,7 +24,6 @@ namespace SefazLib.usuarios
         public string cargo { get; }
         public string email { get; }
         public string id { get; }
-        public string graphToken;
 
         public Usuario(string Login, string Nome, string Foto)
         {
@@ -33,7 +32,7 @@ namespace SefazLib.usuarios
             foto = Foto;
         }
 
-        public Usuario(string Id, string GivenName, string DisplayName, string JobTitle, string Mail, string Photo, string GraphToken)
+        public Usuario(string Id, string GivenName, string DisplayName, string JobTitle, string Mail, string Photo)
         {
             id = Id;
             nomeCompleto = DisplayName;
@@ -42,7 +41,6 @@ namespace SefazLib.usuarios
             email = Mail;
             login = Mail.Split('@')[0];
             foto = Photo;
-            graphToken = GraphToken;
         }
 
         public Usuario()
