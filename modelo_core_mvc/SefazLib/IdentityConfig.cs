@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SefazIdentity;
+using System.Net.Http;
+using System.Collections.Generic;
+using Microsoft.Identity.Web;
 
 namespace SefazLib.IdentityCfg
 {
@@ -21,10 +24,21 @@ namespace SefazLib.IdentityCfg
         public Action<Microsoft.AspNetCore.Authentication.AuthenticationOptions> AuthenticationOptions { get; private set; }
         public Action<OpenIdConnectOptions> OpenIdConnectOptions { get; private set; }
         public static Boolean Logoff { get; private set; }
+        public HttpClient httpClient;
+        public string jwtToken;
+        public string erro;
+        public string[] scopes;
+        public Dictionary<string, string> tokenInfo;
+        private readonly string tenantId;
+        private readonly string clientId;
+        private readonly string clientSecret;
+        private readonly ITokenAcquisition tokenAcquisition;
+
         public IdentityConfig(IConfiguration Configuration)
         {
-            Logoff = false;
+            httpClient = new HttpClient();
             configuration = Configuration;
+            Logoff = false;
 
             AuthenticationOptions = options =>
             {
@@ -109,6 +123,31 @@ namespace SefazLib.IdentityCfg
             };
         }
 
+        // Azure AD
+        public IdentityConfig(IConfiguration Configuration, ITokenAcquisition TokenAcquisition)
+        {
+            tokenAcquisition = TokenAcquisition;
+            httpClient = new HttpClient();
+            configuration = Configuration;
+            clientId = Configuration["AzureAd:ClientId"];
+            clientSecret = Configuration["AzureAd:ClientSecret"];
+            tenantId = Configuration["AzureAd:TenantId"];
+            Logoff = false;
+
+            AuthenticationOptions = options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+            };
+
+            WSFederationOptions = options =>
+            {
+                options.Wtrealm = configuration["identity:realm"];
+                options.MetadataAddress = configuration["identity:metadataaddress"];
+            };
+
+        }
+
         public static async Task Logout(HttpContext httpContext, IConfiguration Configuration)
         {
             await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -175,5 +214,9 @@ namespace SefazLib.IdentityCfg
             context.Response.Redirect("/?errormessage=" + context.Failure.Message);
             return Task.FromResult(0);
         }
+
+        #region
+          
+        #endregion
     }
 }

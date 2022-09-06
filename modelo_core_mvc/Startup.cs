@@ -28,9 +28,9 @@ namespace modelo_core_mvc
         {
             services.AddApplicationInsightsTelemetry();
 
+            #region Tipos de Autenticacao
             IdentityConfig identityConfig = new IdentityConfig(Configuration);
             var opcoesAutenticacao = identityConfig.AuthenticationOptions;
-
             switch (Configuration["identity:type"])
             {
                 case "azuread":
@@ -39,19 +39,23 @@ namespace modelo_core_mvc
                     services.AddMicrosoftIdentityWebAppAuthentication(Configuration)
                             .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
                             .AddInMemoryTokenCaches();
+                    services.AddTransient<ListModel>();
                     break;
+
                 case ("wsfed"):
                     services.AddControllersWithViews();
                     services.AddAuthentication(opcoesAutenticacao)
                             .AddWsFederation(identityConfig.WSFederationOptions)
                             .AddCookie();
                     break;
+
                 case ("openid"):
                     services.AddControllersWithViews();
                     services.AddAuthentication(opcoesAutenticacao)
                             .AddOpenIdConnect(identityConfig.OpenIdConnectOptions)
                             .AddCookie();
                     break;
+
                 default:
                     services.AddControllersWithViews();
                     services.AddAuthentication(opcoesAutenticacao)
@@ -59,11 +63,10 @@ namespace modelo_core_mvc
                             .AddCookie("Cookies", identityConfig.CookieAuthenticationOptions);
                     break;
             }
+            #endregion
 
-            services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddHttpClient<ProjetosApiClient>();
             services.AddTransient<AzureUtil>();
-            services.AddTransient<ListModel>();
+            services.AddHttpClient<ProjetosApiClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

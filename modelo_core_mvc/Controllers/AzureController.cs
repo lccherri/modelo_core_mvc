@@ -9,7 +9,6 @@ using modelo_core_mvc.Models;
 
 namespace modelo_core_mvc.Controllers
 {
-    //[AuthorizeForScopes(Scopes = new[] { "user.read" })]
     public class AzureController : BaseController
     {
         private readonly AzureUtil azureUtil;
