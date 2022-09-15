@@ -37,7 +37,7 @@ namespace SefazLib.AzureUtils
                 Microsoft.Graph.User userAzure;
                 try
                 {
-                    GraphServiceClient graphClientDelegated = await ObterGraphClientAsync("");
+                    GraphServiceClient graphClientDelegated = ObterGraphClient("");
                     userAzure = await graphClientDelegated.Me
                         .Request()
                         .GetAsync();
@@ -72,17 +72,12 @@ namespace SefazLib.AzureUtils
 
         }
 
-        public async Task<GraphServiceClient> ObterGraphClientAsync(string tipoClient)
+        public GraphServiceClient ObterGraphClient(string tipoClient)
         {
             switch (tipoClient)
             {
                 case "Application":
                     return new GraphServiceClient(new ClientSecretCredential(configuration["AzureAd:ClientId"], configuration["AzureAd:TenantId"], configuration["AzureAd:ClientSecret"]));
-
-                case "Http":
-                    identityConfig.SetScope("MSGraph");
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await identityConfig.obterAccessToken(null));
-                    return new GraphServiceClient(httpClient, "https://graph.microsoft.com/v1.0");
 
                 default:
                     identityConfig.SetScope("MSGraph");
@@ -97,7 +92,7 @@ namespace SefazLib.AzureUtils
 
         public async Task<string> buscaSiteId(string siteNome)
         {
-            var graphClient = await ObterGraphClientAsync("Delegated");
+            var graphClient = ObterGraphClient("Delegated");
             var requests = new List<SearchRequestObject>()
             {
                 new SearchRequestObject
@@ -140,7 +135,7 @@ namespace SefazLib.AzureUtils
 
         public async Task<string> buscaListaId(string listaNome, string siteId)
         {
-            var graphClient = await ObterGraphClientAsync("Delegated");
+            var graphClient = ObterGraphClient("Delegated");
             var items = await graphClient.Sites[siteId].Lists
                                             .Request()
                                             .GetAsync();

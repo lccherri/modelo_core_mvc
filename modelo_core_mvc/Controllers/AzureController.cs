@@ -23,7 +23,7 @@ namespace modelo_core_mvc.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var graphClient = await azureUtil.ObterGraphClientAsync("Delegated");
+            var graphClient = azureUtil.ObterGraphClient("Delegated");
             string siteId = await azureUtil.buscaSiteId("CA-DTI-CAP");
             string listaId = await azureUtil.buscaListaId("Modelo_core", siteId);
 
