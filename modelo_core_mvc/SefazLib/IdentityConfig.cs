@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SefazIdentity;
 using System.Net.Http;
@@ -18,6 +17,7 @@ using Azure.Identity;
 using Azure.Core;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace SefazLib.IdentityCfg
 {
@@ -34,9 +34,6 @@ namespace SefazLib.IdentityCfg
         public string erro;
         public string[] scopes;
         public Dictionary<string, string> tokenInfo;
-        private readonly string tenantId;
-        private readonly string clientId;
-        private readonly string clientSecret;
         private readonly ITokenAcquisition tokenAcquisition;
 
         public IdentityConfig(IConfiguration Configuration)
@@ -143,9 +140,6 @@ namespace SefazLib.IdentityCfg
             tokenAcquisition = TokenAcquisition;
             httpClient = new HttpClient();
             configuration = Configuration;
-            clientId = Configuration["AzureAd:ClientId"];
-            clientSecret = Configuration["AzureAd:ClientSecret"];
-            tenantId = Configuration["AzureAd:TenantId"];
             Logoff = false;
 
             AuthenticationOptions = options =>

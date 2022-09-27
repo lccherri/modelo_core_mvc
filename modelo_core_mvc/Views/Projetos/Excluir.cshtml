@@ -9,28 +9,28 @@
     <div class="form-group">
         <dl class="row">
             <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.cd_projeto)
+                @Html.DisplayNameFor(model => model.id)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.cd_projeto)
+                @Html.DisplayFor(model => model.id)
             </dd>
             <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.nm_projeto)
+                @Html.DisplayNameFor(model => model.nome)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.nm_projeto)
+                @Html.DisplayFor(model => model.nome)
             </dd>
             <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.ds_projeto)
+                @Html.DisplayNameFor(model => model.descricao)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.ds_projeto)
+                @Html.DisplayFor(model => model.descricao)
             </dd>
         </dl>
     </div>
 
     <form asp-action="Excluir">
-        <input asp-for="cd_projeto" hidden />
+        <input asp-for="id" hidden />
         <input type="submit" value="Excluir" class="btn btn-outline-danger mr-1" />
         <a asp-action="Index" class="btn btn-cancelar mr-1">Cancelar</a>
     </form>

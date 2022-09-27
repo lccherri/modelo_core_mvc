@@ -28,11 +28,11 @@ namespace modelo_core_mvc.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult> Detalhes(long cd_projeto)
+        public async Task<ActionResult> Detalhes(long id)
         {
             ViewData["Title"] = "Projeto";
             ViewData["Message"] = "";
-            return View(await api.GetProjetoAsync(cd_projeto));
+            return View(await api.GetProjetoAsync(id));
         }
 
         [HttpGet]
@@ -66,11 +66,11 @@ namespace modelo_core_mvc.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> Alterar(long cd_projeto)
+        public async Task<ActionResult> Alterar(long id)
         {
             ViewData["Title"] = "Editar Projeto";
             ViewData["Message"] = "Editar informações do projeto";
-            var model = await api.GetProjetoAsync(cd_projeto);
+            var model = await api.GetProjetoAsync(id);
             return View(model);
         }
 
@@ -95,11 +95,11 @@ namespace modelo_core_mvc.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> Excluir(long cd_projeto)
+        public async Task<ActionResult> Excluir(long id)
         {
             ViewData["Title"] = "Excluir Projeto";
             ViewData["Message"] = "Exclusão do projeto";
-            var model = await api.GetProjetoAsync(cd_projeto);
+            var model = await api.GetProjetoAsync(id);
             return View(model);
         }
 
@@ -111,7 +111,7 @@ namespace modelo_core_mvc.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    await api.DeleteProjetoAsync(model.cd_projeto);
+                    await api.DeleteProjetoAsync(model.id);
                     return RedirectToAction("Index");
                 }
                 return BadRequest();
@@ -120,7 +120,7 @@ namespace modelo_core_mvc.Controllers
             {
                 ViewData["Title"] = "Excluir Projeto";
                 ViewData["Message"] = "Exclusão do projeto"; 
-                model = await api.GetProjetoAsync(model.cd_projeto);
+                model = await api.GetProjetoAsync(model.id);
                 ViewData["Erro"] = "Essa aplicação não está configurada para acessar a API.";
                 return View(model);
             }

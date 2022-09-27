@@ -10,13 +10,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.cd_projeto)
+                @Html.DisplayNameFor(model => model.id)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.nm_projeto)
+                @Html.DisplayNameFor(model => model.nome)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ds_projeto)
+                @Html.DisplayNameFor(model => model.descricao)
             </th>
             <th></th>
         </tr>
@@ -26,18 +26,18 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.cd_projeto)
+                    @Html.DisplayFor(modelItem => item.id)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.nm_projeto)
+                    @Html.DisplayFor(modelItem => item.nome)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.ds_projeto)
+                    @Html.DisplayFor(modelItem => item.descricao)
                 </td>
                 <td>
-                    @Html.ActionLink("Alterar", "Alterar", new { item.cd_projeto }) |
-                    @Html.ActionLink("Detalhes", "Detalhes", new { item.cd_projeto }) |
-                    @Html.ActionLink("Excluir", "Excluir", new { item.cd_projeto })
+                    @Html.ActionLink("Alterar", "Alterar", new { item.id }) |
+                    @Html.ActionLink("Detalhes", "Detalhes", new { item.id }) |
+                    @Html.ActionLink("Excluir", "Excluir", new { item.id })
                 </td>
             </tr>
         }

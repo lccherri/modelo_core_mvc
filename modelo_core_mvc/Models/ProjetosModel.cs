@@ -9,16 +9,16 @@ namespace modelo_core_mvc.projetos
     public class ProjetosModel
     {
         [Display(Name = "Cód")]
-        public long cd_projeto { get; set; }
+        public long id { get; set; }
         [Display(Name = "Nome")]
-        public string nm_projeto { get; set; }
+        public string nome { get; set; }
         [Display(Name = "Descrição")]
-        public string ds_projeto { get; set; }
-        public ProjetosModel(long cd_projeto, string nm_projeto, string ds_projeto)
+        public string descricao { get; set; }
+        public ProjetosModel(long Id, string Nome, string Descricao)
         {
-            this.cd_projeto = cd_projeto;
-            this.nm_projeto = nm_projeto;
-            this.ds_projeto = ds_projeto;
+            id = Id;
+            nome = Nome;
+            descricao = Descricao;
         }
 
         public ProjetosModel()

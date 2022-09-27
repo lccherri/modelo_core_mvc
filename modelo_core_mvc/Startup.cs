@@ -31,6 +31,8 @@ namespace modelo_core_mvc
             #region Tipos de Autenticacao
             IdentityConfig identityConfig = new IdentityConfig(Configuration);
             var opcoesAutenticacao = identityConfig.AuthenticationOptions;
+            // Sugestao: exclua os tipos de autenticacao que não forem usados para simplificar o codigo 
+            // Esse switch e so para exemplificar os diversos tipos possiveis na Sefaz
             switch (Configuration["identity:type"])
             {
                 case "azuread":

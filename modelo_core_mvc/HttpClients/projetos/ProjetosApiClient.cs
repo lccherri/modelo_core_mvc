@@ -26,10 +26,10 @@ namespace modelo_core_mvc.ProjetosApi
         }
 
         //Consultar
-        public async Task<ProjetosModel> GetProjetoAsync(long cd_projeto)
+        public async Task<ProjetosModel> GetProjetoAsync(long id)
         {
             httpClient.DefaultRequestHeaders.Authorization = await identityConfig.AuthenticationHeader();
-            var resposta = await httpClient.GetAsync($"Projetos/{cd_projeto}");
+            var resposta = await httpClient.GetAsync($"Projetos/{id}");
             resposta.EnsureSuccessStatusCode();
             return new ProjetosModel().ToModel(await resposta.Content.ReadAsStringAsync());
         }
@@ -58,12 +58,12 @@ namespace modelo_core_mvc.ProjetosApi
             return await resposta.Content.ReadAsStringAsync();
         }
 
-        public async Task DeleteProjetoAsync(long cd_projeto)
+        public async Task DeleteProjetoAsync(long id)
         {
-            if (cd_projeto != 0)
+            if (id != 0)
             {
                 httpClient.DefaultRequestHeaders.Authorization = await identityConfig.AuthenticationHeader();
-                var resposta = await httpClient.DeleteAsync($"Projetos/{cd_projeto}");
+                var resposta = await httpClient.DeleteAsync($"Projetos/{id}");
                 resposta.EnsureSuccessStatusCode();
             }
         }
@@ -87,9 +87,9 @@ namespace modelo_core_mvc.ProjetosApi
             }
         }
 
-        public async Task<byte[]> GetAnexoAsync(long cd_projeto)
+        public async Task<byte[]> GetAnexoAsync(long id)
         {
-            var resposta = await httpClient.GetAsync($"Projetos/{cd_projeto}/anexo");
+            var resposta = await httpClient.GetAsync($"Projetos/{id}/anexo");
             resposta.EnsureSuccessStatusCode();
             return await resposta.Content.ReadAsByteArrayAsync();
         }
