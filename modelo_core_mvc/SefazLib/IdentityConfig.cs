@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using SefazIdentity;
 using System.Net.Http;
 using System.Collections.Generic;
 using Microsoft.Identity.Web;
@@ -18,6 +17,7 @@ using Azure.Core;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using TokenWS;
 
 namespace SefazLib.IdentityCfg
 {
