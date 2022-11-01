@@ -110,6 +110,31 @@ namespace SefazLib.IdentityCfg
                 };
             };
 
+            if (Configuration["identity:type"] == "nam")
+            {
+                OpenIdConnectOptions = options =>
+                {
+                    options.ClientId = configuration["identity:clientid"];
+                    options.Authority = configuration["identity:authority"];
+                    options.MetadataAddress = configuration["identity:metadataaddess"];
+                    options.SignedOutRedirectUri = configuration["identity:realm"];
+                    options.SignInScheme = "Cookies";
+                    options.RequireHttpsMetadata = true;
+                    options.ResponseType = OpenIdConnectResponseType.Code;
+                    options.UsePkce = false;
+                    options.Scope.Clear();
+                    options.Scope.Add("openid");
+                    options.Scope.Add("profile");
+                    options.Scope.Add("email");
+                    options.SaveTokens = true;
+
+                    options.Events = new OpenIdConnectEvents
+                    {
+                        OnRemoteFailure = OnAuthenticationFailed
+                    };
+                };
+            };
+
             CookieAuthenticationOptions = options =>
             {
                 options.Cookie = new CookieBuilder
@@ -210,7 +235,7 @@ namespace SefazLib.IdentityCfg
                 case "jwt":
                     await httpContext.SignOutAsync(JwtBearerDefaults.AuthenticationScheme);
                     break;
-                case ("openid" or "azuread"):
+                case ("openid" or "azuread" or "nam"):
                     await httpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
                     break;
                 default:

@@ -57,6 +57,13 @@ namespace modelo_core_mvc
                             .AddCookie();
                     break;
 
+                case ("nam"):
+                    services.AddControllersWithViews();
+                    services.AddAuthentication(opcoesAutenticacao)
+                            .AddOpenIdConnect(identityConfig.OpenIdConnectOptions)
+                            .AddCookie();
+                    break;
+
                 default:
                     services.AddControllersWithViews();
                     services.AddAuthentication(opcoesAutenticacao)
